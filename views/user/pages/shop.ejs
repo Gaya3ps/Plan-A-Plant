@@ -1,0 +1,109 @@
+<section class="bg-img1 txt-center p-lr-15 p-tb-12" style="background-image: url('images/bg-01.jpg');">
+    <h2 class="ltext-105 cl0 txt-center">Contact</h2>
+</section>
+
+<div class="bg0 m-t-23 p-b-140">
+    <div class="container">
+        <!-- Filter and Sorting Form -->
+        <form id="filterForm" action="/shop" method="GET">
+            <!-- Category Filter Dropdown -->
+            <div class="flex-w flex-l-m filter-tope-group m-tb-10">
+                <% if (categories.length > 0) { %>
+                    <% categories.forEach(category => { %>
+                        <li>
+                            <button class="stext-106 cl6 hov1 bor3 trans-04 m-r-32 m-tb-5" data-filter="categoryFilter">
+                                <a href="/shop?p=<%= currentPage %>&category=<%= category.categoryName %>" class="text-dark <%= selectedCategory === category._id ? 'text-dark' : '' %>">
+                                    <%= category.categoryName %>
+                                </a>
+                            </button>
+                        </li>
+                    <% }); %>
+                <% } else { %>
+                    <h3>NO CATEGORIES</h3>
+                <% } %>
+            </div>
+
+            <!-- Sorting Options Dropdown -->
+            <div class="filter-dropdown">
+                <select name="sortBy" onchange="document.getElementById('filterForm').submit()">
+                    <option value="priceLowToHigh" <%= sortBy === 'priceLowToHigh' ? 'selected' : '' %>>Price: Low to High</option>
+                    <option value="priceHighToLow" <%= sortBy === 'priceHighToLow' ? 'selected' : '' %>>Price: High to Low</option>
+                </select>
+            </div>
+
+            <!-- Price Range Filter Dropdown -->
+            <div class="filter-dropdown">
+                <select name="priceRange" onchange="document.getElementById('filterForm').submit()">
+                    <option value="all" <%= priceRange === 'all' ? 'selected' : '' %>>All Prices</option>
+                    <option value="0-200" <%= priceRange === '0-200' ? 'selected' : '' %>>₹0.00 - ₹200.00</option>
+                    <option value="200-500" <%= priceRange === '200-500' ? 'selected' : '' %>>₹200.00 - ₹500.00</option>
+                    <option value="500-1000" <%= priceRange === '500-1000' ? 'selected' : '' %>>₹500.00 - ₹1000.00</option>
+                    <option value="1000-2000" <%= priceRange === '1000-2000' ? 'selected' : '' %>>₹1000.00 - ₹2000.00</option>
+                    <option value="2000+" <%= priceRange === '2000+' ? 'selected' : '' %>>₹2000.00+</option>
+                </select>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="search-product pos-relative bo4 of-hidden">
+                <input class="s-text7 size6 p-l-23 p-r-50" type="text" name="search" placeholder="Search Products..." value="<%= search %>">
+                <button class="flex-c-m size5 ab-r-m color2 color0-hov trans-04" type="submit">
+                    <i class="fs-12 fa fa-search" aria-hidden="true"></i>
+                </button>
+            </div>
+        </form>
+        <br><br><br>
+
+        <!-- Products Grid -->
+        <div class="row isotope-grid">
+            <% for (let i=0; i < product.length; i++) { %>
+                <div class="col-sm-6 col-md-4 col-lg-3 p-b-35 isotope-item women">
+                    <!-- Block2 -->
+                    <% for (let j=0; j < product[i].primaryImage.length; j++) { %>
+                        <div class="block2">
+                            <div class="block2-pic hov-img0">
+                                <img src="/admin/uploads/<%= product[i].primaryImage[0].name %>" alt="IMG-PRODUCT">
+                            </div>
+
+                            <div class="block2-txt flex-w flex-t p-t-14">
+                                <div class="block2-txt-child1 flex-col-l">
+                                    <a href="/product?id=<%= product[i]._id %>"
+                                        class="stext-104 cl4 hov-cl1 trans-04 js-name-b2 p-b-6">
+                                        <%= product[i].title %>
+                                    </a>
+
+                                    <span class="stext-105 cl3">
+                                        Rs<%= product[i].salePrice %>
+                                    </span>
+                                </div>
+
+                               
+                            </div>
+                        </div>
+                        <% } %>
+                </div>
+                <% } %>
+        </div>
+
+
+</div>
+
+</div>
+
+<style>
+   
+    .filter-dropdown select {
+        padding: 10px;
+        margin-bottom: 10px;
+        width: 100%;
+        border: 1px solid #ccc; 
+    }
+
+  .search-product {
+
+    padding: 10px;
+        margin-bottom: 10px;
+        width: 100%;
+        border: 1px solid #ccc; 
+    }
+  
+</style>
