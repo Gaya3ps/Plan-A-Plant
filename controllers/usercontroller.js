@@ -5,9 +5,12 @@ const Cart = require("../models/cartModel");
 const Category = require("../models/categoryModel");
 const Banner = require("../models/bannerModel");
 const asyncHandler = require("express-async-handler");
-const { sendOtp } = require("../utility/nodemailer");
-const { generateOTP } = require("../utility/nodemailer");
-const { sendVerifymail } = require("../utility/nodemailer");
+const {
+  sendOtp,
+  generateOTP,
+  sendVerifymail,
+} = require("../utility/nodemailer.js");
+
 const bcrypt = require("bcrypt");
 const randomstring = require("randomstring");
 
@@ -100,7 +103,6 @@ const loadshoppage = async (req, res) => {
     const categoryMapping = {};
 
     listedCategories.forEach((category) => {
-
       categoryMapping[category.categoryName] = category._id;
     });
 
@@ -192,7 +194,9 @@ const loadproductdetail = async (req, res) => {
 
     const getalldata = await Product.findById(productId);
     if (!getalldata) {
-      return res.status(404).render("./user/pages/404", { title: "404 Not Found" });
+      return res
+        .status(404)
+        .render("./user/pages/404", { title: "404 Not Found" });
     }
 
     res.render("./user/pages/productdetail", { getalldata, user });
@@ -242,8 +246,6 @@ const register = async (req, res) => {
 
 //OTP Section
 
-
-
 // loadSentOTP
 const sendOTPpage = async (req, res) => {
   try {
@@ -286,7 +288,7 @@ const verifyOTP = asyncHandler(async (req, res) => {
 //resending otp
 const reSendOTP = async (req, res) => {
   try {
-    const OTP = generateOTP(); 
+    const OTP = generateOTP();
     console.log(OTP);
     req.session.otpUser.otp = { otp: OTP };
     const email = req.session.otpUser.email;
@@ -476,5 +478,5 @@ module.exports = {
   forgetLoad,
   forgetpswd,
   forgetPswdload,
-  resetPswd
+  resetPswd,
 };
