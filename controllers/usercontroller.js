@@ -10,7 +10,7 @@ import { find, findById as _findById } from "../models/productModel.js";
 import Cart from "../models/cartModel.js";
 import { find as _find } from "../models/categoryModel.js";
 import { find as __find } from "../models/bannerModel.js";
-import asyncHandler from "express-async-handler.js";
+import asyncHandler from "express-async-handler";
 import { sendOtp, generateOTP, sendVerifymail } from "../utility/nodeMailer.js";
 
 import { hash } from "bcrypt";
