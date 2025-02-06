@@ -1,19 +1,10 @@
-import category, {
-  find,
-  findOne,
-  findByIdAndUpdate,
-  findById,
-} from "../models/categoryModel.js";
-import {
-  find as _find,
-  findByIdAndUpdate as _findByIdAndUpdate,
-} from "../models/productModel.js";
-import expressHandler from "express-async-handler";
+import Product from "../models/productModel";
+import category from "../models/categoryModel";
 
 // category page
 const categoryManagement = async (req, res) => {
   try {
-    const findCategory = await find();
+    const findCategory = await category.find();
     res.render("./admin/pages/categories", {
       catList: findCategory,
       title: "Categories",
@@ -26,7 +17,7 @@ const categoryManagement = async (req, res) => {
 // addCategory form
 const addCategory = async (req, res) => {
   try {
-    const findCategory = await find();
+    const findCategory = await category.find();
 
     res.render("./admin/pages/addCategory", {
       catList: findCategory,
@@ -44,7 +35,7 @@ const insertCategory = async (req, res) => {
     const categoryOffer = req.body.addOffer;
 
     const regexCategoryName = new RegExp(`^${categoryName}$`, "i");
-    const findCat = await findOne({ categoryName: regexCategoryName });
+    const findCat = await category.findOne({ categoryName: regexCategoryName });
 
     if (findCat) {
       const catCheck = `Category ${categoryName} Already existing`;
@@ -70,7 +61,7 @@ const list = async (req, res) => {
   try {
     const id = req.params.id;
 
-    const listing = await findByIdAndUpdate(
+    const listing = await category.findByIdAndUpdate(
       { _id: id },
       { $set: { isListed: true } }
     );
@@ -84,7 +75,7 @@ const list = async (req, res) => {
 const unList = async (req, res) => {
   try {
     const id = req.params.id;
-    const listing = await findByIdAndUpdate(
+    const listing = await category.findByIdAndUpdate(
       { _id: id },
       { $set: { isListed: false } }
     );
@@ -98,7 +89,7 @@ const unList = async (req, res) => {
 const editCategory = async (req, res) => {
   try {
     const { id } = req.params;
-    const catName = await findById(id);
+    const catName = await category.findById(id);
     if (catName) {
       res.render("./admin/pages/editCategory", {
         title: "editCategory",
@@ -122,9 +113,11 @@ const updateCategoryAndProductPrices = async (categoryId, newCategoryOffer) => {
       newCategoryOffer = 0;
     }
 
-    await findByIdAndUpdate(categoryId, { categoryOffer: newCategoryOffer });
+    await category.findByIdAndUpdate(categoryId, {
+      categoryOffer: newCategoryOffer,
+    });
 
-    const products = await _find({ categoryName: categoryId });
+    const products = await Product.find({ categoryName: categoryId });
 
     for (const product of products) {
       const productOffer = parseFloat(product.offer) || 0;
@@ -136,7 +129,7 @@ const updateCategoryAndProductPrices = async (categoryId, newCategoryOffer) => {
           ? product.productPrice - (product.productPrice * higherOffer) / 100
           : product.productPrice;
 
-      await _findByIdAndUpdate(product._id, { salePrice: salePrice });
+      await Product.findByIdAndUpdate(product._id, { salePrice: salePrice });
     }
   } catch (error) {
     console.error("Error updating category and product prices:", error);
@@ -150,7 +143,7 @@ const updateCategory = async (req, res) => {
     const categoryOffer = req.body.addOffer;
 
     // Update the category
-    await findByIdAndUpdate(id, {
+    await category.findByIdAndUpdate(id, {
       $set: { categoryName: updatedName, categoryOffer: categoryOffer },
     });
 
@@ -167,7 +160,7 @@ const updateCategory = async (req, res) => {
 const searchCategory = async (req, res) => {
   try {
     const data = req.body.search;
-    const searching = await find({
+    const searching = await category.find({
       categoryName: { $regex: data, $options: "i" },
     });
     if (searching) {
@@ -183,7 +176,7 @@ const searchCategory = async (req, res) => {
   }
 };
 
-export default {
+export {
   categoryManagement,
   addCategory,
   insertCategory,

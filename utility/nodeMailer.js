@@ -1,4 +1,4 @@
-import transporter from "../config/emailSender.js"
+import transporter from "../config/emailSender.js";
 function generateOTP() {
   const min = 1000;
   const max = 9999;

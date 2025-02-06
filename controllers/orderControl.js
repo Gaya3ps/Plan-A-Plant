@@ -1,30 +1,14 @@
-import { updateOne, findById } from "../models/userModels.js";
-import {
-  findByIdAndUpdate,
-  findById as _findById,
-} from "../models/productModel.js";
-import Category from "../models/categoryModel.js";
-import { findOne, findOneAndUpdate } from "../models/cartModel.js";
-import Address from "../models/addressModel.js";
-import {
-  insertMany,
-  create,
-  find,
-  findOne as _findOne,
-  findById as __findById,
-  findByIdAndUpdate as _findByIdAndUpdate,
-} from "../models/orderModel.js";
-import { findOne as __findOne } from "../models/couponModel.js";
+import User from "../models/userModels.js";
+import Product from "../models/productModel.js";
+import Cart from "../models/cartModel.js";
+import Order from "../models/orderModel.js";
+import coupons from "../models/couponModel.js";
 import dotenv from "dotenv";
-dotenv.config();
-
 import Razorpay from "razorpay";
-import {
-  findOne as ___findOne,
-  updateOne as _updateOne,
-  create as _create,
-} from "../models/walletModel.js";
+import userWallet from "../models/walletModel.js";
 import verifyOrderPayment from "../helper/razorpay.js";
+
+dotenv.config();
 
 const razorpay = new Razorpay({
   key_id: process.env.key_id,
@@ -38,7 +22,7 @@ const confirmOrder = async (req, res) => {
     const paymentMethod = req.body.selectedPaymentMethod;
     const total = req.body.total;
 
-    let cart = await findOne({ user_id: userId }).populate(
+    let cart = await Cart.findOne({ user_id: userId }).populate(
       "products.productId"
     );
 
@@ -46,7 +30,7 @@ const confirmOrder = async (req, res) => {
     const appliedCoupon = (req.body.appliedCoupon || "").trim();
     let discountAmount = total;
     if (appliedCoupon !== "") {
-      let coupon = await __findOne({ couponName: appliedCoupon.trim() });
+      let coupon = await coupons.findOne({ couponName: appliedCoupon.trim() });
       if (coupon) {
         coupon.usedBy = userId;
         await coupon.save();
@@ -77,27 +61,27 @@ const confirmOrder = async (req, res) => {
       order.paymentMethod === "wallet"
     ) {
       for (const item of order.products) {
-        await findByIdAndUpdate(item.product, {
+        await Product.findByIdAndUpdate(item.product, {
           $inc: { sold: item.quantity },
         });
         const productId = item.product;
         const orderedQuantity = item.quantity;
 
-        await findByIdAndUpdate(
+        await Product.findByIdAndUpdate(
           productId,
           { $inc: { quantity: -orderedQuantity } },
           { new: true }
         );
       }
 
-      const orderData = await insertMany(order);
-      await findOneAndUpdate(
+      const orderData = await Order.insertMany(order);
+      await Cart.findOneAndUpdate(
         { user_id: userId },
         { $set: { products: [], total: 0 } }
       );
 
       if (order.paymentMethod === "wallet") {
-        const wallet = await ___findOne({ userId: userId });
+        const wallet = await userWallet.findOne({ userId: userId });
 
         if (!wallet || wallet.balance < order.grandTotal) {
           return res
@@ -111,7 +95,7 @@ const confirmOrder = async (req, res) => {
           date: orderData[0].orderDate,
         };
 
-        await _updateOne(
+        await userWallet.updateOne(
           { userId: userId },
           {
             $push: {
@@ -121,7 +105,7 @@ const confirmOrder = async (req, res) => {
           }
         );
 
-        await updateOne(
+        await User.updateOne(
           { _id: userId },
           { $inc: { wallet: -order.grandTotal } }
         );
@@ -154,24 +138,24 @@ const verifyPayment = async (req, res) => {
     verifyOrderPayment(req.body)
       .then(async () => {
         const userId = req.session.user_id;
-        const user = await findById(userId);
-        const cart = await findOne({ user_id: userId });
+        const user = await User.findById(userId);
+        const cart = await Cart.findOne({ user_id: userId });
         const orderData = req.body.orderdetails;
-        const orderDocument = await create(orderData);
+        const orderDocument = await Order.create(orderData);
 
         if (orderDocument) {
           for (const product of cart.products) {
             const productId = product.productId;
             const orderedQuantity = product.quantity;
 
-            await findByIdAndUpdate(
+            await Product.findByIdAndUpdate(
               productId,
               { $inc: { quantity: -orderedQuantity } },
               { new: true }
             );
           }
 
-          await findOneAndUpdate(
+          await Cart.findOneAndUpdate(
             { user_id: userId },
             { $set: { products: [], total: 0 } }
           );
@@ -211,7 +195,7 @@ const addToWallet = async (req, res) => {
     };
 
     // Update userWallet
-    await _updateOne(
+    await userWallet.updateOne(
       { userId: req.session.user_id },
       {
         $inc: { balance: refundAmount },
@@ -222,7 +206,7 @@ const addToWallet = async (req, res) => {
     );
 
     // Update user model (optional)
-    await updateOne(
+    await User.updateOne(
       { _id: req.session.user_id },
       { $inc: { wallet: refundAmount } }
     );
@@ -247,8 +231,8 @@ const loadSuccess = async (req, res) => {
 const loadOrderList = async (req, res) => {
   try {
     const userId = req.session.user_id;
-    const user = await findById(userId);
-    const orderDetails = await find({ user: userId })
+    const user = await User.findById(userId);
+    const orderDetails = await Order.find({ user: userId })
       .populate({
         path: "products.product",
         select: "primaryImage",
@@ -266,10 +250,10 @@ const loadOrderList = async (req, res) => {
 const loadorderDetailing = async (req, res) => {
   try {
     const userId = req.session.user_id;
-    const user = await findById(userId);
+    const user = await User.findById(userId);
     const orderId = req.query.id;
 
-    const orderDetails = await _findOne({ user: userId, _id: orderId })
+    const orderDetails = await Order.findOne({ user: userId, _id: orderId })
       .populate({
         path: "products.product",
         select: "title primaryImage",
@@ -307,7 +291,7 @@ const cancelOrder = async (req, res) => {
 const cancelOrderById = async (req, res, next) => {
   try {
     const orderId = req.body.orderId;
-    const order = await __findById(orderId).populate("products.product");
+    const order = await Order.findById(orderId).populate("products.product");
 
     if (order.products.every((item) => item.returnStatus === "Cancelled")) {
       return "Order is already cancelled";
@@ -320,7 +304,7 @@ const cancelOrderById = async (req, res, next) => {
       })
     ) {
       for (const item of order.products) {
-        const updatedOrderItem = await _findByIdAndUpdate(
+        const updatedOrderItem = await Order.findByIdAndUpdate(
           item._id,
           {
             $set: { "products.$.returnStatus": "Cancelled" },
@@ -328,14 +312,14 @@ const cancelOrderById = async (req, res, next) => {
           { new: true }
         );
 
-        const cancelledProduct = await _findById(item.product);
+        const cancelledProduct = await Product.findById(item.product);
         cancelledProduct.quantity += item.quantity;
         cancelledProduct.sold -= item.quantity;
         await cancelledProduct.save();
       }
 
       // Update order status
-      await _findByIdAndUpdate(orderId, {
+      await Order.findByIdAndUpdate(orderId, {
         status: "Cancelled",
       });
 
@@ -347,7 +331,7 @@ const cancelOrderById = async (req, res, next) => {
       })
     ) {
       for (const item of order.products) {
-        const updatedOrderItem = await _findByIdAndUpdate(
+        const updatedOrderItem = await Order.findByIdAndUpdate(
           item._id,
           {
             $set: { "products.$.returnStatus": "Cancelled" },
@@ -355,14 +339,14 @@ const cancelOrderById = async (req, res, next) => {
           { new: true }
         );
 
-        const cancelledProduct = await _findById(item.product);
+        const cancelledProduct = await Product.findById(item.product);
         cancelledProduct.quantity += item.quantity;
         cancelledProduct.sold -= item.quantity;
         await cancelledProduct.save();
       }
 
       // Update order status
-      await _findByIdAndUpdate(orderId, {
+      await Order.findByIdAndUpdate(orderId, {
         status: "Cancelled",
       });
 
@@ -378,7 +362,7 @@ const cancelOrderById = async (req, res, next) => {
 const returnOrderById = async (req, res, next) => {
   try {
     const orderId = req.body.orderId;
-    const order = await __findById(orderId).populate("products.product");
+    const order = await Order.findById(orderId).populate("products.product");
 
     if (order.products.every((item) => item.returnStatus === "Cancelled")) {
       return res
@@ -397,19 +381,19 @@ const returnOrderById = async (req, res, next) => {
     }
 
     for (const item of order.products) {
-      const updatedOrderItem = await _findByIdAndUpdate(
+      const updatedOrderItem = await Order.findByIdAndUpdate(
         item._id,
         { $set: { "products.$.returnStatus": "Return Requested" } },
         { new: true }
       );
 
-      const returnedProduct = await _findById(item.product);
+      const returnedProduct = await Product.findById(item.product);
 
       await returnedProduct.save();
     }
 
     // Update order status
-    await _findByIdAndUpdate(orderId, { status: "Return Requested" });
+    await Order.findByIdAndUpdate(orderId, { status: "Return Requested" });
 
     return res.status(200).json({ status: true, message: "Return Requested" });
   } catch (error) {
@@ -438,7 +422,7 @@ const rejectReturn = async (req, res) => {
 
 const rejectReturnById = async (orderId) => {
   try {
-    const order = await _findByIdAndUpdate(orderId, {
+    const order = await Order.findByIdAndUpdate(orderId, {
       status: "Return Rejected",
     });
 
@@ -471,7 +455,7 @@ const acceptReturn = async (req, res) => {
 
 const acceptReturnById = async (orderId, userId) => {
   try {
-    const order = await __findById(orderId);
+    const order = await Order.findById(orderId);
 
     if (!order) {
       return "Order not found";
@@ -513,7 +497,7 @@ const calculateRefundAmount = (products) => {
 
 const refundToWallet = async (userId, refundAmount, orderId, username) => {
   try {
-    const wallet = await ___findOne({ userId });
+    const wallet = await userWallet.findOne({ userId });
 
     if (wallet) {
       wallet.balance += refundAmount;
@@ -527,7 +511,7 @@ const refundToWallet = async (userId, refundAmount, orderId, username) => {
       await wallet.save();
     } else {
       // Create a new wallet entry if the user doesn't have a wallet yet
-      await _create({
+      await userWallet.create({
         userId,
         username: username,
         balance: refundAmount,
@@ -550,7 +534,7 @@ const refundToWallet = async (userId, refundAmount, orderId, username) => {
 const loadWallet = async (req, res) => {
   try {
     const userId = req.session.user_id;
-    const user = await findById(userId);
+    const user = await User.findById(userId);
 
     const { incomePage, expensePage } = req.query;
 
@@ -559,7 +543,7 @@ const loadWallet = async (req, res) => {
 
     const itemsPerPage = 2;
 
-    const wallet = await ___findOne({ userId: req.session.user_id });
+    const wallet = await userWallet.findOne({ userId: req.session.user_id });
 
     const startIndexIncome = (incomePageNumber - 1) * itemsPerPage;
     const endIndexIncome = startIndexIncome + itemsPerPage;
@@ -598,7 +582,7 @@ const loadWallet = async (req, res) => {
   }
 };
 
-export default {
+export {
   loadSuccess,
   confirmOrder,
   loadorderDetailing,

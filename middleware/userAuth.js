@@ -21,7 +21,4 @@ const isLogout = async (req, res, next) => {
   }
 };
 
-export default {
-  isLogin,
-  isLogout,
-};
+export { isLogin, isLogout };

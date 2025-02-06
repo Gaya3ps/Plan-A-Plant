@@ -1,19 +1,17 @@
 import dotenv from "dotenv";
+import crypto from "crypto";
+
 dotenv.config();
-import crypto from "crypto"
 
-import Razorpay from "razorpay";
-
-export default (details) => {
+const verifyPayment = (details) => {
   return new Promise((resolve, reject) => {
     try {
-      let hmac = crypto.createHmac("sha256", process.env.key_secret);
-      hmac.update(
-        details.payment.razorpay_order_id +
-          "|" +
-          details.payment.razorpay_payment_id
-      );
-      hmac = hmac.digest("hex");
+      const hmac = crypto
+        .createHmac("sha256", process.env.key_secret)
+        .update(
+          `${details.payment.razorpay_order_id}|${details.payment.razorpay_payment_id}`
+        )
+        .digest("hex");
 
       if (hmac === details.payment.razorpay_signature) {
         console.log("Verify SUCCESS");
@@ -28,3 +26,5 @@ export default (details) => {
     }
   });
 };
+
+export default verifyPayment;

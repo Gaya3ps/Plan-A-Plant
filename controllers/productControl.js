@@ -1,20 +1,13 @@
-import Product, {
-  find,
-  findByIdAndUpdate,
-  findById,
-} from "../models/productModel.js";
-import { find as _find, findById as _findById } from "../models/categoryModel.js";
-import fs from "fs";
+import Product from "../models/productModel.js";
+import Category from "../models/categoryModel.js";
 import expressHandler from "express-async-handler";
-import { upload } from "../config/upload.js";
 import sharp from "sharp";
-import { join } from "path";
-import mongoose from "mongoose";
+import path from "path";
 
 // productManagement
 const productManagement = expressHandler(async (req, res) => {
   try {
-    const findProduct = await find().populate("categoryName");
+    const findProduct = await Product.find().populate("categoryName");
     res.render("./admin/pages/productlist", {
       title: "Products",
       productList: findProduct,
@@ -27,7 +20,7 @@ const productManagement = expressHandler(async (req, res) => {
 // addProduct Page
 const addProduct = expressHandler(async (req, res) => {
   try {
-    const category = await _find({ isListed: true });
+    const category = await Category.find({ isListed: true });
     if (category) {
       res.render("./admin/pages/addProduct", {
         title: "addProduct",
@@ -51,7 +44,7 @@ const insertProduct = expressHandler(async (req, res) => {
 
     const secondaryImages = [];
     for (const e of req.files.secondaryImage) {
-      const croppedImage = join(
+      const croppedImage = path.join(
         __dirname,
         "../public/admin/uploads",
         `cropped_${e.filename}`
@@ -68,7 +61,7 @@ const insertProduct = expressHandler(async (req, res) => {
     }
     const { offer, productPrice, categoryName } = req.body;
 
-    const filteredCategory = await _findById({ _id: categoryName });
+    const filteredCategory = await Category.findById({ _id: categoryName });
 
     if (
       filteredCategory.categoryOffer > 0 &&
@@ -114,7 +107,7 @@ const insertProduct = expressHandler(async (req, res) => {
 const listProduct = expressHandler(async (req, res) => {
   try {
     const id = req.params.id;
-    const listing = await findByIdAndUpdate(
+    const listing = await Product.findByIdAndUpdate(
       { _id: id },
       { $set: { isListed: true } }
     );
@@ -129,7 +122,7 @@ const listProduct = expressHandler(async (req, res) => {
 const unListProduct = expressHandler(async (req, res) => {
   try {
     const id = req.params.id;
-    const listing = await findByIdAndUpdate(
+    const listing = await Product.findByIdAndUpdate(
       { _id: id },
       { $set: { isListed: false } }
     );
@@ -144,8 +137,10 @@ const editProductPage = expressHandler(async (req, res) => {
   try {
     const id = req.params.id;
 
-    const category = await _find({ isListed: true });
-    const productFound = await findById(id).populate("categoryName").exec();
+    const category = await Category.find({ isListed: true });
+    const productFound = await Product.findById(id)
+      .populate("categoryName")
+      .exec();
 
     if (productFound) {
       res.render("./admin/pages/editProduct", {
@@ -161,7 +156,7 @@ const editProductPage = expressHandler(async (req, res) => {
 const updateProduct = expressHandler(async (req, res) => {
   try {
     const id = req.params.id;
-    const existingProduct = await findById(id);
+    const existingProduct = await Product.findById(id);
 
     let primaryImage;
     if (req.files.primaryImage) {
@@ -223,7 +218,7 @@ const updateProduct = expressHandler(async (req, res) => {
       offer: req.body.offer,
     };
 
-    const updatedProduct = await findByIdAndUpdate(id, editingProduct, {
+    const updatedProduct = await Product.findByIdAndUpdate(id, editingProduct, {
       new: true,
     });
 
@@ -233,7 +228,7 @@ const updateProduct = expressHandler(async (req, res) => {
   }
 });
 
-export default {
+export {
   addProduct,
   insertProduct,
   productManagement,

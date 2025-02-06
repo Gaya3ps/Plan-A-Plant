@@ -1,18 +1,19 @@
-import { default as mongoose } from "mongoose";
-import { find, create, findById, findByIdAndUpdate, findOneAndDelete } from "../models/addressModel.js";
-import { findById as _findById } from "../models/userModels.js";
+import mongoose from "mongoose";
+import Address from "../models/addressModel.js";
+import User from "../models/userModels.js";
 import asyncHandler from "express-async-handler";
+
 
 const getAllAddress = asyncHandler(async (req, res) => {
   const userId = req.session.user_id;
-  const user = await _findById(userId);
-  const address = await find({ user: userId });
+  const user = await User.findById(userId);
+  const address = await Address.find({ user: userId });
   res.render("user/pages/address", { address, account: true, user });
 });
 
 const addAddressPage = asyncHandler(async (req, res) => {
   const userId = req.session.user_id;
-  const user = await _findById(userId);
+  const user = await User.findById(userId);
   res.render("user/pages/addAddress", { user });
 });
 
@@ -24,7 +25,7 @@ const newAddress = asyncHandler(async (req, res) => {
   let data = {};
   data = req.body;
   data.user = req.body.user_id;
-  const newAddress = await create(req.body);
+  const newAddress = await Address.create(req.body);
   if (newAddress) {
     res.redirect("/address");
   } else {
@@ -37,9 +38,9 @@ const newAddress = asyncHandler(async (req, res) => {
 const editAddressPage = async (req, res) => {
   try {
     const userId = req.session.user_id;
-    const user = await _findById(userId);
+    const user = await User.findById(userId);
 
-    const address = await findById(req.query.id);
+    const address = await Address.findById(req.query.id);
    
 
     res.render("./user/pages/editAddress", { address, user });
@@ -63,7 +64,7 @@ const editAddress = asyncHandler(async (req, res) => {
       pincode: req.body.pincode,
       phone: req.body.mobile,
     };
-    const save = await findByIdAndUpdate(
+    const save = await Address.findByIdAndUpdate(
       { _id: id },
       { $set: saveAddress },
       { new: true }
@@ -82,14 +83,14 @@ const editAddress = asyncHandler(async (req, res) => {
 const deleteAddress = asyncHandler(async (req, res) => {
   try {
     const id = req.params.id;
-    const deleteAddress = await findOneAndDelete({ _id: id });
+    const deleteAddress = await Address.findOneAndDelete({ _id: id });
     res.redirect("/address");
   } catch (error) {
     throw new Error(error);
   }
 });
 
-export default {
+export {
   getAllAddress,
   addAddressPage,
   newAddress,

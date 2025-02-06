@@ -1,24 +1,22 @@
-import { findById } from "../models/productModel.js";
-import { findById as _findById, findOne } from "../models/userModels.js";
-import { find, findOne as _findOne, create } from "../models/cartModel.js";
-import { find as _find } from "../models/addressModel.js";
-import { findOne as __findOne } from "../models/walletModel.js";
-import { find as __find } from "../models/couponModel.js";
+import Product from "../models/productModel";
+import User from "../models/userModels";
+import Cart from "../models/cartModel";
+import Address from "../models/addressModel";
+import userWallet from "../models/walletModel";
+import coupons from "../models/couponModel";
 
 const loadshopcartpage = async (req, res) => {
   try {
     const userId = req.session.user_id;
-    const user = await _findById(userId);
+    const user = await User.findById(userId);
     const error = req.session.insufficientstock
       ? req.session.insufficientstock
       : "";
     req.session.insufficientstock = "";
-    const getCart = await find({ user_id: user }).populate(
+    const getCart = await Cart.find({ user_id: user }).populate(
       "products.productId"
     );
-
     let total = 0;
-
     if (getCart && getCart.length > 0) {
       getCart.forEach((cartItem) => {
         if (cartItem.products && cartItem.products.length > 0) {
@@ -50,14 +48,14 @@ const addToCart = async (req, res) => {
   try {
     const userId = req.session.user_id;
     const productId = req.body.productId;
-    const product = await findById(productId);
+    const product = await Product.findById(productId);
 
-    let cart = await _findOne({ user_id: userId }).populate(
+    let cart = await Cart.findOne({ user_id: userId }).populate(
       "products.productId"
     );
 
     if (!cart) {
-      cart = await create({ user_id: userId, products: [] });
+      cart = await Cart.create({ user_id: userId, products: [] });
     }
     const existingItem = cart.products.find((item) =>
       item.productId.equals(productId)
@@ -93,7 +91,7 @@ const removeProduct = async (req, res) => {
     const productId = req.query.id;
     const user = req.session.user_id;
 
-    const getCart = await _findOne({ user_id: user });
+    const getCart = await Cart.findOne({ user_id: user });
     if (getCart) {
       const productIndex = getCart.products.findIndex(
         (item) => item.productId.toString() === productId
@@ -130,8 +128,8 @@ const removeProduct = async (req, res) => {
 const loadCheckOutpage = async (req, res) => {
   try {
     const userId = req.session.user_id;
-    const user = await _findById(userId);
-    const getCart = await find({ user_id: user }).populate(
+    const user = await User.findById(userId);
+    const getCart = await Cart.find({ user_id: user }).populate(
       "products.productId"
     );
 
@@ -148,7 +146,7 @@ const loadCheckOutpage = async (req, res) => {
     }
 
     //collecting coupons
-    let allCoupons = await __find({
+    let allCoupons = await coupons.find({
       $and: [
         { usedBy: { $ne: userId } },
         { expiryDate: { $gt: new Date() } },
@@ -160,7 +158,9 @@ const loadCheckOutpage = async (req, res) => {
       ],
     });
     console.log("All coupons : ", allCoupons);
-    let userData = await findOne({ _id: userId }).populate("coupons").exec();
+    let userData = await User.findOne({ _id: userId })
+      .populate("coupons")
+      .exec();
     let couponIds = new Set(allCoupons.map((coupon) => coupon.couponName));
     console.log(" coupon ids : ", couponIds);
     userData.coupons.filter((coupon) => {
@@ -170,10 +170,10 @@ const loadCheckOutpage = async (req, res) => {
       }
     });
 
-    let walletAmount = await __findOne({
+    let walletAmount = await userWallet.findOne({
       userId: req.session.user_id,
     });
-    const address = await _find({ user: userId });
+    const address = await Address.find({ user: userId });
     const total = getCart.reduce((acc, cart) => acc + cart.total, 0);
     res.render("./user/pages/checkOut", {
       getCart,
@@ -191,11 +191,11 @@ const loadCheckOutpage = async (req, res) => {
 const updateCart = async (req, res) => {
   try {
     const userId = req.session.user_id;
-    const user = await _findById(userId);
+    const user = await User.findById(userId);
     let updatedQuantity = req.body.quantity;
     const productId = req.body.productId;
 
-    const getCart = await _findOne({ user_id: user._id }).populate(
+    const getCart = await Cart.findOne({ user_id: user._id }).populate(
       "products.productId"
     );
 
@@ -244,7 +244,7 @@ const updateCart = async (req, res) => {
   }
 };
 
-export default {
+export {
   loadshopcartpage,
   addToCart,
   loadCheckOutpage,
