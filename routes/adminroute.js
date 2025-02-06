@@ -2,9 +2,10 @@ import express from "express";
 import productController from "../controllers/productControl.js";
 import adminAuth from "../middleware/adminAuth.js";
 import categoryController from "../controllers/categoryControl.js";
-import { upload } from "../config/upload.js";
+import upload from "../config/upload.js";
 import bannerController from "../controllers/bannerController.js";
 import dotenv from "dotenv";
+import admincontroller from "../controllers/admincontroller.js"
 
 dotenv.config();
 

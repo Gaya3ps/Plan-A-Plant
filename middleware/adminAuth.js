@@ -16,5 +16,5 @@ const isLogout = (req, res, next) => {
   }
 };
 
-export { isLogin, isLogout };
+export default { isLogin, isLogout };
 

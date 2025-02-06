@@ -129,7 +129,13 @@ function sendVerifymail(name, email, token) {
   });
 }
 
-export default {
+// export default {
+//   sendOtp,
+//   generateOTP,
+//   sendVerifymail,
+// };
+
+export  {
   sendOtp,
   generateOTP,
   sendVerifymail,

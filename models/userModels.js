@@ -1,6 +1,6 @@
 import { compareSync } from "bcrypt";
-import crypto from "crypto";
-import { Schema, model } from "mongoose";
+import { Schema } from "mongoose";
+import mongoose from "mongoose";
 
 var userSchema = new Schema(
   {
@@ -45,4 +45,6 @@ userSchema.methods.verifyPassword = function (password) {
 };
 
 //Export the model
-export default model("User", userSchema);
+// export default model("User", userSchema);
+const User = mongoose.model("User", userSchema);
+export default User;

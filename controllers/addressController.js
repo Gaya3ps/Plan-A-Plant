@@ -90,7 +90,18 @@ const deleteAddress = asyncHandler(async (req, res) => {
   }
 });
 
-export {
+// export  {
+//   getAllAddress,
+//   addAddressPage,
+//   newAddress,
+//   editAddressPage,
+//   editAddress,
+//   deleteAddress,
+// };
+
+
+
+export default {
   getAllAddress,
   addAddressPage,
   newAddress,

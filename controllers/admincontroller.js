@@ -1,8 +1,8 @@
-import User from "../models/orderModel";
-import Order from "../models/orderModel";
-const numeral = require("numeral");
-const moment = require("moment");
-import coupons from "../models/orderModel";
+import User from "../models/userModels.js";
+import Order from "../models/orderModel.js";
+import numeral from "numeral";
+import moment from "moment";
+import coupons from "../models/couponModel.js";
 
 const loadLogin = async (req, res) => {
   try {
@@ -459,7 +459,7 @@ function convertDateAndTime(dateString) {
   return { day, time, dayOfWeek, dateString };
 }
 
-export {
+export default {
   loadDashboard,
   loadproductlist,
   loadorders,

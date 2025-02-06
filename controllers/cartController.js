@@ -1,9 +1,9 @@
-import Product from "../models/productModel";
-import User from "../models/userModels";
-import Cart from "../models/cartModel";
-import Address from "../models/addressModel";
-import userWallet from "../models/walletModel";
-import coupons from "../models/couponModel";
+import Product from "../models/productModel.js";
+import User from "../models/userModels.js";
+import Cart from "../models/cartModel.js";
+import Address from "../models/addressModel.js";
+import userWallet from "../models/walletModel.js";
+import coupons from "../models/couponModel.js";
 
 const loadshopcartpage = async (req, res) => {
   try {
@@ -244,7 +244,7 @@ const updateCart = async (req, res) => {
   }
 };
 
-export {
+export default {
   loadshopcartpage,
   addToCart,
   loadCheckOutpage,

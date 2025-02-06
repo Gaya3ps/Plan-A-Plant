@@ -450,7 +450,7 @@ const userlogout = async (req, res) => {
   }
 };
 
-export {
+export default {
   loadloginpage,
   loadregistration,
   loadaboutpage,

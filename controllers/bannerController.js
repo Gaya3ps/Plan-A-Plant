@@ -1,4 +1,4 @@
-import Banner from "../models/bannerModel";
+import Banner from "../models/bannerModel.js";
 
 function newformatDate(date) {
   const day = String(date.getDate()).padStart(2, "0");
@@ -164,7 +164,7 @@ const bannerDelete_get = async (req, res) => {
   }
 };
 
-export {
+export  default {
   newBanner_get,
   banner_get,
   newBanner_post,

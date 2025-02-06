@@ -228,7 +228,7 @@ const updateProduct = expressHandler(async (req, res) => {
   }
 });
 
-export {
+export default {
   addProduct,
   insertProduct,
   productManagement,

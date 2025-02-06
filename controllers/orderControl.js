@@ -582,7 +582,7 @@ const loadWallet = async (req, res) => {
   }
 };
 
-export {
+export default {
   loadSuccess,
   confirmOrder,
   loadorderDetailing,

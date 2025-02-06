@@ -1,5 +1,5 @@
-import Product from "../models/productModel";
-import category from "../models/categoryModel";
+import Product from "../models/productModel.js";
+import category from "../models/categoryModel.js";
 
 // category page
 const categoryManagement = async (req, res) => {
@@ -176,7 +176,7 @@ const searchCategory = async (req, res) => {
   }
 };
 
-export {
+export default {
   categoryManagement,
   addCategory,
   insertCategory,
