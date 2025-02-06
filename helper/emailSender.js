@@ -1,10 +1,5 @@
-import { createTransport } from "nodemailer";
+import transporter from './emailConfig.js';
 
-const transporter = createTransport({
-  service: "Gmail",
-  auth: {
-    user: "gayathri07211@gmail.com",
-    pass: "uldi flhq dovm vcuj",
-  },
-});
-export default transporter;
+export const sendMail = (mailOptions, callback) => {
+  transporter.sendMail(mailOptions, callback);
+};

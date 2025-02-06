@@ -1,4 +1,4 @@
-import { sendMail } from "../helper/emailSender";
+import { sendMail } from "../helper/emailSender.js";
 
 function generateOTP() {
   const min = 1000;
