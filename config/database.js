@@ -1,14 +1,14 @@
 // DataBase connnection settings---
-const mongoose = require('mongoose');
+import { connect, connection } from 'mongoose';
 require('dotenv').config();
 
 const dbConnect = () => {
-    mongoose.connect(process.env.MONGO_URL, {
+    connect(process.env.MONGO_URL, {
         useNewUrlParser: true,
         useUnifiedTopology: true, 
         
     });
-    let db = mongoose.connection;
+    let db = connection;
     
     db.on('connected', () => {
         console.log('Connected to MongoDB');
@@ -18,4 +18,4 @@ const dbConnect = () => {
     });
 };
 
-module.exports = { dbConnect };
+export default { dbConnect };

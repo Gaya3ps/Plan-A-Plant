@@ -1,7 +1,7 @@
-const mongoose = require("mongoose");
-const FlexApiBase = require("twilio/lib/rest/FlexApiBase");
+import { Schema, model } from "mongoose";
+import FlexApiBase from "twilio/lib/rest/FlexApiBase";
 
-const couponSchema = mongoose.Schema(
+const couponSchema = Schema(
   {
     couponName: {
       type: String,
@@ -19,7 +19,7 @@ const couponSchema = mongoose.Schema(
     },
     usedBy: [
       {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "userModel",
         required: false,
       },
@@ -45,4 +45,4 @@ couponSchema.pre("find", preMethod);
 couponSchema.pre("findOne", preMethod);
 couponSchema.pre("findMany", preMethod);
 
-module.exports = mongoose.model("coupons", couponSchema);
+export default model("coupons", couponSchema);

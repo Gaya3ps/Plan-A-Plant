@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
+import { Schema, model } from "mongoose";
 
-const bannerSchema = new mongoose.Schema({
+const bannerSchema = new Schema({
   title: {
     type: String,
     required: true,
@@ -50,6 +50,6 @@ const bannerSchema = new mongoose.Schema({
   },
 });
 
-const Banner = mongoose.model("Banner", bannerSchema);
+const Banner = model("Banner", bannerSchema);
 
-module.exports = Banner;
+export default Banner;

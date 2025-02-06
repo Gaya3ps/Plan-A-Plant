@@ -1,11 +1,11 @@
-const express = require("express");
-const adminRoute = express.Router();
-const admincontroller = require("../controllers/admincontroller");
-const productController = require("../controllers/productControl");
-const adminAuth = require("../middleware/adminAuth");
-const categoryController = require("../controllers/categoryControl");
-const { upload } = require("../config/upload");
-const bannerController = require("../controllers/bannerController");
+import { Router } from "express";
+const adminRoute = Router();
+import { loadLogin, adminPanel, loadDashboard, adminlogout, userManagement, searchUser, useraction, loadorders, loadorderdetails, OrderStatusupdate, salesReportpage, generateSalesReport, getSalesData, getSalesDataWeekly, getSalesDataYearly, manageCoupons, addCoupon, insertCoupon } from "../controllers/admincontroller";
+import { addProduct, insertProduct, productManagement, listProduct, unListProduct, editProductPage, updateProduct } from "../controllers/productControl";
+import { isLogout, isLogin } from "../middleware/adminAuth";
+import { categoryManagement, addCategory, insertCategory, list, unList, editCategory, updateCategory, searchCategory } from "../controllers/categoryControl";
+import { upload } from "../config/upload";
+import { banner_get, newBanner_get, newBanner_post, bannerEdit_get, bannerEdit_post, bannerDelete_get } from "../controllers/bannerController";
 
 require("dotenv").config();
 
@@ -14,65 +14,65 @@ adminRoute.use((req, res, next) => {
   next();
 });
 
-adminRoute.get("/", adminAuth.isLogout, admincontroller.loadLogin);
-adminRoute.post("/", admincontroller.adminPanel);
+adminRoute.get("/", isLogout, loadLogin);
+adminRoute.post("/", adminPanel);
 
-adminRoute.get("/dashboard", admincontroller.loadDashboard);
-adminRoute.get("/logout", adminAuth.isLogin, admincontroller.adminlogout);
+adminRoute.get("/dashboard", loadDashboard);
+adminRoute.get("/logout", isLogin, adminlogout);
 
 //USER MANAGEMENT
 
-adminRoute.get("/user", adminAuth.isLogin, admincontroller.userManagement);
-adminRoute.post("/user", adminAuth.isLogin, admincontroller.searchUser);
-adminRoute.get("/useractions", adminAuth.isLogin, admincontroller.useraction);
+adminRoute.get("/user", isLogin, userManagement);
+adminRoute.post("/user", isLogin, searchUser);
+adminRoute.get("/useractions", isLogin, useraction);
 
 // categoryManagement---
 adminRoute.get(
   "/category",
-  adminAuth.isLogin,
-  categoryController.categoryManagement
+  isLogin,
+  categoryManagement
 );
 adminRoute.get(
   "/addCategory",
-  adminAuth.isLogin,
-  categoryController.addCategory
+  isLogin,
+  addCategory
 );
 adminRoute.post(
   "/addCategory",
-  adminAuth.isLogin,
-  categoryController.insertCategory
+  isLogin,
+  insertCategory
 );
 adminRoute.get(
   "/category/list/:id",
-  adminAuth.isLogin,
-  categoryController.list
+  isLogin,
+  list
 );
 adminRoute.get(
   "/category/unList/:id",
-  adminAuth.isLogin,
-  categoryController.unList
+  isLogin,
+  unList
 );
 adminRoute.get(
   "/editCategory/:id",
-  adminAuth.isLogin,
-  categoryController.editCategory
+  isLogin,
+  editCategory
 );
 adminRoute.post(
   "/editCategory/:id",
-  adminAuth.isLogin,
-  categoryController.updateCategory
+  isLogin,
+  updateCategory
 );
 adminRoute.post(
   "/category/search",
-  adminAuth.isLogin,
-  categoryController.searchCategory
+  isLogin,
+  searchCategory
 );
 
 // Product Management---
 adminRoute.get(
   "/product/addProduct",
-  adminAuth.isLogin,
-  productController.addProduct
+  isLogin,
+  addProduct
 );
 
 adminRoute.post(
@@ -81,28 +81,28 @@ adminRoute.post(
     { name: "secondaryImage", maxCount: 3 },
     { name: "primaryImage", maxCount: 1 },
   ]),
-  productController.insertProduct
+  insertProduct
 ); /** Product adding and multer using  **/
 
 adminRoute.get(
   "/product",
-  adminAuth.isLogin,
-  productController.productManagement
+  isLogin,
+  productManagement
 );
 adminRoute.post(
   "/product/list/:id",
-  adminAuth.isLogin,
-  productController.listProduct
+  isLogin,
+  listProduct
 );
 adminRoute.post(
   "/product/unList/:id",
-  adminAuth.isLogin,
-  productController.unListProduct
+  isLogin,
+  unListProduct
 );
 adminRoute.get(
   "/product/editproduct/:id",
-  adminAuth.isLogin,
-  productController.editProductPage
+  isLogin,
+  editProductPage
 );
 adminRoute.post(
   "/product/editproduct/:id",
@@ -110,68 +110,68 @@ adminRoute.post(
     { name: "secondaryImage", maxCount: 3 },
     { name: "primaryImage", maxCount: 1 },
   ]),
-  productController.updateProduct
+  updateProduct
 );
 
 // order
-adminRoute.get("/orders", adminAuth.isLogin, admincontroller.loadorders);
+adminRoute.get("/orders", isLogin, loadorders);
 adminRoute.get(
   "/orderdetails/:id",
-  adminAuth.isLogin,
-  admincontroller.loadorderdetails
+  isLogin,
+  loadorderdetails
 );
 adminRoute.post(
   "/orderdetails/update/:id",
-  adminAuth.isLogin,
-  admincontroller.OrderStatusupdate
+  isLogin,
+  OrderStatusupdate
 );
 
 //salesreport
 adminRoute.get(
   "/salesreport",
-  adminAuth.isLogin,
-  admincontroller.salesReportpage
+  isLogin,
+  salesReportpage
 );
 adminRoute.get(
   "/get/sales-report",
-  adminAuth.isLogin,
-  admincontroller.generateSalesReport
+  isLogin,
+  generateSalesReport
 );
-adminRoute.get("/sales-data", adminAuth.isLogin, admincontroller.getSalesData);
+adminRoute.get("/sales-data", isLogin, getSalesData);
 adminRoute.get(
   "/sales-data/weekly",
-  adminAuth.isLogin,
-  admincontroller.getSalesDataWeekly
+  isLogin,
+  getSalesDataWeekly
 );
 adminRoute.get(
   "/sales-data/yearly",
-  adminAuth.isLogin,
-  admincontroller.getSalesDataYearly
+  isLogin,
+  getSalesDataYearly
 );
 
 //Manage Coupons
 adminRoute.get(
   "/manageCoupons/:page",
-  adminAuth.isLogin,
-  admincontroller.manageCoupons
+  isLogin,
+  manageCoupons
 );
-adminRoute.get("/addCoupon", adminAuth.isLogin, admincontroller.addCoupon);
-adminRoute.post("/addCoupon", adminAuth.isLogin, admincontroller.insertCoupon);
+adminRoute.get("/addCoupon", isLogin, addCoupon);
+adminRoute.post("/addCoupon", isLogin, insertCoupon);
 
 //<!--BnnerManagement-->
-adminRoute.get("/manageBanner", bannerController.banner_get);
-adminRoute.get("/banner/newBanner", bannerController.newBanner_get);
+adminRoute.get("/manageBanner", banner_get);
+adminRoute.get("/banner/newBanner", newBanner_get);
 adminRoute.post(
   "/banner/newBanner",
   upload.fields([{ name: "bannerImage" }]),
-  bannerController.newBanner_post
+  newBanner_post
 );
-adminRoute.get("/banner/editBanner/:bannerId", bannerController.bannerEdit_get);
+adminRoute.get("/banner/editBanner/:bannerId", bannerEdit_get);
 adminRoute.post(
   "/banner/editBanner",
   upload.fields([{ name: "bannerImage" }]),
-  bannerController.bannerEdit_post
+  bannerEdit_post
 );
-adminRoute.get("/banner/deleteBanner/:id", bannerController.bannerDelete_get);
+adminRoute.get("/banner/deleteBanner/:id", bannerDelete_get);
 
-module.exports = adminRoute;
+export default adminRoute;

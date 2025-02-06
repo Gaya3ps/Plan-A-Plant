@@ -1,11 +1,11 @@
-const category = require("../models/categoryModel");
-const Product = require("../models/productModel")
-const expressHandler = require("express-async-handler");
+import category, { find, findOne, findByIdAndUpdate, findById } from "../models/categoryModel";
+import { find as _find, findByIdAndUpdate as _findByIdAndUpdate } from "../models/productModel";
+import expressHandler from "express-async-handler";
 
 // category page
 const categoryManagement = async (req, res) => {
   try {
-    const findCategory = await category.find();
+    const findCategory = await find();
     res.render("./admin/pages/categories", {
       catList: findCategory,
       title: "Categories",
@@ -18,7 +18,7 @@ const categoryManagement = async (req, res) => {
 // addCategory form
 const addCategory = async (req, res) => {
   try {
-    const findCategory = await category.find();
+    const findCategory = await find();
 
     res.render("./admin/pages/addCategory", {
       catList: findCategory,
@@ -36,7 +36,7 @@ const insertCategory = async (req, res) => {
     const categoryOffer = req.body.addOffer;
 
     const regexCategoryName = new RegExp(`^${categoryName}$`, "i");
-    const findCat = await category.findOne({ categoryName: regexCategoryName });
+    const findCat = await findOne({ categoryName: regexCategoryName });
 
     if (findCat) {
       const catCheck = `Category ${categoryName} Already existing`;
@@ -62,7 +62,7 @@ const list = async (req, res) => {
   try {
     const id = req.params.id;
 
-    const listing = await category.findByIdAndUpdate(
+    const listing = await findByIdAndUpdate(
       { _id: id },
       { $set: { isListed: true } }
     );
@@ -76,7 +76,7 @@ const list = async (req, res) => {
 const unList = async (req, res) => {
   try {
     const id = req.params.id;
-    const listing = await category.findByIdAndUpdate(
+    const listing = await findByIdAndUpdate(
       { _id: id },
       { $set: { isListed: false } }
     );
@@ -90,7 +90,7 @@ const unList = async (req, res) => {
 const editCategory = async (req, res) => {
   try {
     const { id } = req.params;
-    const catName = await category.findById(id);
+    const catName = await findById(id);
     if (catName) {
       res.render("./admin/pages/editCategory", {
         title: "editCategory",
@@ -115,9 +115,9 @@ const updateCategoryAndProductPrices = async (categoryId, newCategoryOffer) => {
     }
 
    
-    await category.findByIdAndUpdate(categoryId, { categoryOffer: newCategoryOffer });
+    await findByIdAndUpdate(categoryId, { categoryOffer: newCategoryOffer });
 
-    const products = await Product.find({ categoryName: categoryId });
+    const products = await _find({ categoryName: categoryId });
 
     for (const product of products) {
       const productOffer = parseFloat(product.offer) || 0;
@@ -126,7 +126,7 @@ const updateCategoryAndProductPrices = async (categoryId, newCategoryOffer) => {
 
       let salePrice = higherOffer > 0 ? product.productPrice - (product.productPrice * higherOffer) / 100 : product.productPrice;
 
-      await Product.findByIdAndUpdate(product._id, { salePrice: salePrice });
+      await _findByIdAndUpdate(product._id, { salePrice: salePrice });
     }
   } catch (error) {
     console.error("Error updating category and product prices:", error);
@@ -140,7 +140,7 @@ const updateCategory = async (req, res) => {
     const categoryOffer = req.body.addOffer;
 
     // Update the category
-    await category.findByIdAndUpdate(id, {
+    await findByIdAndUpdate(id, {
       $set: { categoryName: updatedName, categoryOffer: categoryOffer },
     });
 
@@ -157,7 +157,7 @@ const updateCategory = async (req, res) => {
 const searchCategory = async (req, res) => {
   try {
     const data = req.body.search;
-    const searching = await category.find({
+    const searching = await find({
       categoryName: { $regex: data, $options: "i" },
     });
     if (searching) {
@@ -173,7 +173,7 @@ const searchCategory = async (req, res) => {
   }
 };
 
-module.exports = {
+export default {
   categoryManagement,
   addCategory,
   insertCategory,

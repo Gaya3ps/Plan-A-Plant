@@ -4,4 +4,4 @@ function setErrorMessage(req, res, next) {
   next();
 }
 
-module.exports = setErrorMessage;
+export default setErrorMessage;

@@ -1,12 +1,12 @@
-const User = require("../models/userModels");
-const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
-const Order = require("../models/orderModel");
-const Address = require("../models/addressModel");
-const numeral = require("numeral");
-const moment = require("moment");
-const Product = require("../models/productModel");
-const coupons = require("../models/couponModel");
+import { countDocuments, findOne, find, findById } from "../models/userModels";
+import mongoose from "mongoose";
+import bcrypt from "bcrypt";
+import { find as _find, aggregate, countDocuments as _countDocuments, findById as _findById, findByIdAndUpdate } from "../models/orderModel";
+import Address from "../models/addressModel";
+import numeral from "numeral";
+import moment from "moment";
+import Product from "../models/productModel";
+import { find as __find, countDocuments as __countDocuments, findOne as _findOne, create } from "../models/couponModel";
 
 const loadLogin = async (req, res) => {
   try {
@@ -19,7 +19,7 @@ const loadLogin = async (req, res) => {
 const loadDashboard = async (req, res) => {
   try {
     const user = req?.user;
-    const recentOrders = await Order.find()
+    const recentOrders = await _find()
       .limit(5)
       .populate({
         path: "user",
@@ -39,7 +39,7 @@ const loadDashboard = async (req, res) => {
     
 
     totalSalesAmount = numeral(totalSalesAmount).format("0.0a");
-    const totalSoldProducts = await Order.aggregate([
+    const totalSoldProducts = await aggregate([
       {
         $match: { status: "Delivered" }, 
       },
@@ -56,8 +56,8 @@ const loadDashboard = async (req, res) => {
       },
     ]);
 
-    const totalOrderCount = await Order.countDocuments();
-    const totalActiveUserCount = await User.countDocuments();
+    const totalOrderCount = await _countDocuments();
+    const totalActiveUserCount = await countDocuments();
 
     res.render("./admin/pages/index", {
       title: "Dashboard",
@@ -87,10 +87,10 @@ const loadorders = async (req, res) => {
     const pageSize = 10;
     const currentPage = parseInt(req.query.page) || 1;
 
-    const totalOrders = await Order.countDocuments();
+    const totalOrders = await _countDocuments();
     const totalPages = Math.ceil(totalOrders / pageSize);
 
-    const orders = await Order.find()
+    const orders = await _find()
       .populate("address")
       .sort({ orderDate: -1 })
       .skip((currentPage - 1) * pageSize)
@@ -110,7 +110,7 @@ const loadorders = async (req, res) => {
 const loadorderdetails = async (req, res) => {
   try {
     const orderId = req.params.id;
-    const order = await Order.findById(orderId)
+    const order = await _findById(orderId)
       .populate("address")
       .populate("products.product")
       .populate("user");
@@ -130,7 +130,7 @@ const OrderStatusupdate = async (req, res) => {
  
 
   try {
-    const order = await Order.findByIdAndUpdate(
+    const order = await findByIdAndUpdate(
       orderId,
       { status: newStatus },
       { new: true }
@@ -150,7 +150,7 @@ const adminPanel = async (req, res) => {
 
     const emailCheck = req.body.email;
 
-    const user = await User.findOne({ email: emailCheck });
+    const user = await findOne({ email: emailCheck });
 
     if (user) {
       res.render("./admin/pages/acclogin", {
@@ -175,7 +175,7 @@ const adminPanel = async (req, res) => {
 //USER MANAGEMENT
 const userManagement = async (req, res) => {
   try {
-    const findUsers = await User.find();
+    const findUsers = await find();
 
     res.render("./admin/pages/userList", {
       users: findUsers,
@@ -190,7 +190,7 @@ const userManagement = async (req, res) => {
 const searchUser = async (req, res) => {
   try {
     const data = req.body.search;
-    const searching = await User.find({
+    const searching = await find({
       userName: { $regex: data, $options: "i" },
     });
     if (searching) {
@@ -210,7 +210,7 @@ const useraction = async (req, res) => {
   const userID = req.query.id;
   const action = req.query.action;
   try {
-    const user = await User.findById(userID);
+    const user = await findById(userID);
     if (!user) {
       return res.status(400).send("user not found");
     }
@@ -243,7 +243,7 @@ const generateSalesReport = async (req, res, next) => {
 
     const deliveryStatus = "Delivered";
 
-    const salesData = await Order.find({
+    const salesData = await _find({
       orderDate: {
         $gte: fromDate,
         $lte: toDate,
@@ -303,7 +303,7 @@ const getSalesData = async (req, res) => {
       },
     ];
 
-    const monthlySalesArray = await Order.aggregate(pipeline);
+    const monthlySalesArray = await aggregate(pipeline);
     console.log(monthlySalesArray);
 
     res.json(monthlySalesArray);
@@ -338,7 +338,7 @@ const getSalesDataYearly = async (req, res) => {
       },
     ];
 
-    const yearlySalesArray = await Order.aggregate(yearlyPipeline);
+    const yearlySalesArray = await aggregate(yearlyPipeline);
     res.json(yearlySalesArray);
   } catch (error) {
     console.error(error);
@@ -375,7 +375,7 @@ const getSalesDataWeekly = async (req, res) => {
       },
     ];
 
-    const weeklySalesArray = await Order.aggregate(weeklySalesPipeline);
+    const weeklySalesArray = await aggregate(weeklySalesPipeline);
     console.log(weeklySalesArray);
 
     res.json(weeklySalesArray);
@@ -398,11 +398,10 @@ const adminlogout = async (req, res) => {
 const manageCoupons = async (req, res) => {
   let page = parseInt(req.params.page) || 1;
   let perPage = 5;
-  let allCoupons = await coupons
-    .find({})
+  let allCoupons = await __find({})
     .skip((page - 1) * perPage)
     .limit(perPage);
-  let totalCoupons = await coupons.countDocuments({});
+  let totalCoupons = await __countDocuments({});
   let totalPages = Math.ceil(totalCoupons / perPage);
   allCoupons.forEach((coupon) => {
     coupon.expiredOn = convertDateAndTime(coupon.expiryDate);
@@ -423,7 +422,7 @@ const addCoupon = async (req, res) => {
 
 const insertCoupon = async (req, res) => {
   const couponName = req.body.couponName;
- const existingCoupon = await coupons.findOne({ couponName });
+ const existingCoupon = await _findOne({ couponName });
 
  if (existingCoupon) {
   return res.render("./admin/pages/addCoupon", {
@@ -433,7 +432,7 @@ const insertCoupon = async (req, res) => {
 }
 
 
-  await coupons.create(req.body);
+  await create(req.body);
   res.render("./admin/pages/addCoupon", {
     title: "Add New Coupon",
     alert: "New coupon " + req.body.couponName + " added.",
@@ -471,7 +470,7 @@ function convertDateAndTime(dateString) {
 
 
 
-module.exports = {
+export default {
   loadDashboard,
   loadproductlist,
   loadorders,

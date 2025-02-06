@@ -1,9 +1,9 @@
-const mongoose = require("mongoose");
+import { Schema, model } from "mongoose";
 
-const walletSchema = mongoose.Schema(
+const walletSchema = Schema(
   {
     userId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
@@ -21,7 +21,7 @@ const walletSchema = mongoose.Schema(
           type: Number,
         },
         orderId: {
-          type: mongoose.Schema.Types.ObjectId,
+          type: Schema.Types.ObjectId,
         },
         date: {
           type: Date,
@@ -37,7 +37,7 @@ const walletSchema = mongoose.Schema(
           type: Number,
         },
         orderId: {
-          type: mongoose.Schema.Types.ObjectId,
+          type: Schema.Types.ObjectId,
         },
         date: {
           type: Date,
@@ -48,4 +48,4 @@ const walletSchema = mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("userWallet", walletSchema);
+export default model("userWallet", walletSchema);

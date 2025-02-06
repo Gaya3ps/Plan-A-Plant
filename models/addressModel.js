@@ -1,9 +1,9 @@
-const mongoose = require("mongoose");
+import { Schema, Types, model } from "mongoose";
 
-var addressSchema = new mongoose.Schema(
+var addressSchema = new Schema(
   {
     user: {
-      type: mongoose.Types.ObjectId,
+      type: Types.ObjectId,
       ref: "User",
     },
     user_name: {
@@ -38,4 +38,4 @@ var addressSchema = new mongoose.Schema(
 );
 
 //Export the model
-module.exports = mongoose.model("Address", addressSchema);
+export default model("Address", addressSchema);

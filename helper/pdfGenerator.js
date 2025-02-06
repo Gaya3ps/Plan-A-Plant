@@ -1,15 +1,15 @@
-const PDFDocument = require("pdfkit");
-const Order = require("../models/orderModel");
-const User = require("../models/userModels");
-const productModel = require("../models/productModel");
+import PDFDocument from "pdfkit";
+import { findOne } from "../models/orderModel";
+import { findById } from "../models/userModels";
+import productModel from "../models/productModel";
 
 const generateInvoicePdf = async (req, res) => {
   try {
     const userId = req.session.user_id;
-    const user = await User.findById(userId);
+    const user = await findById(userId);
     const orderId = req.query.id;
 
-    const orders = await Order.findOne({ user: userId, _id: orderId })
+    const orders = await findOne({ user: userId, _id: orderId })
       .populate({
         path: "products.product",
         select: "title primaryImage",
@@ -76,6 +76,6 @@ const generateInvoicePdf = async (req, res) => {
   }
 };
 
-module.exports = {
+export default {
   generateInvoicePdf,
 };

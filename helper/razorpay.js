@@ -1,7 +1,7 @@
 require("dotenv").config();
-const Razorpay = require("razorpay");
+import Razorpay from "razorpay";
 
-module.exports = (details) => {
+export default (details) => {
   return new Promise((resolve, reject) => {
     try {
       const crypto = require("crypto");

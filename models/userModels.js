@@ -1,8 +1,8 @@
-const bcrypt = require("bcrypt");
-const crypto = require("crypto");
-const mongoose = require("mongoose");
+import { compareSync } from "bcrypt";
+import crypto from "crypto";
+import { Schema, model } from "mongoose";
 
-var userSchema = new mongoose.Schema(
+var userSchema = new Schema(
   {
     username: {
       type: String,
@@ -31,7 +31,7 @@ var userSchema = new mongoose.Schema(
 
     coupons: [
       {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "coupons",
         required: false,
       },
@@ -41,8 +41,8 @@ var userSchema = new mongoose.Schema(
 );
 
 userSchema.methods.verifyPassword = function (password) {
-  return bcrypt.compareSync(password, this.password);
+  return compareSync(password, this.password);
 };
 
 //Export the model
-module.exports = mongoose.model("User", userSchema);
+export default model("User", userSchema);

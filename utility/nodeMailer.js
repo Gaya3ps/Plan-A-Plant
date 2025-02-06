@@ -1,4 +1,4 @@
-const transporter = require("../config/emailSender")
+const transporter = require("../config/emailSender");
 function generateOTP() {
   const min = 1000;
   const max = 9999;

@@ -1,4 +1,4 @@
-const Banner = require("../models/bannerModel");
+import Banner, { find, findById, findByIdAndUpdate, findOneAndDelete } from "../models/bannerModel";
 
 function newformatDate(date) {
   const day = String(date.getDate()).padStart(2, "0");
@@ -9,7 +9,7 @@ function newformatDate(date) {
 
 const banner_get = async (req, res) => {
   try {
-    const allBanner = await Banner.find();
+    const allBanner = await find();
 
     allBanner.forEach((item) => {
       item.startDate = newformatDate(item.startDate);
@@ -83,7 +83,7 @@ const bannerEdit_get = async (req, res) => {
   const bannerId = req.params.bannerId;
 
   try {
-    const getBanner = await Banner.findById(bannerId);
+    const getBanner = await findById(bannerId);
 
     if (getBanner) {
       res.render("./admin/pages/editBanner", {
@@ -134,7 +134,7 @@ const bannerEdit_post = async (req, res) => {
       updateFields.endDate = end_date;
     }
 
-    const getBanner = await Banner.findByIdAndUpdate(
+    const getBanner = await findByIdAndUpdate(
       bannerId,
       { $set: updateFields },
       { new: true }
@@ -153,7 +153,7 @@ const bannerDelete_get = async (req, res) => {
   try {
     const id = req.params.id;
     console.log("Banner id", id);
-    const getBanner = await Banner.findOneAndDelete({ _id: id });
+    const getBanner = await findOneAndDelete({ _id: id });
 
     if (!getBanner) {
       return res.status(400).json({ message: "Banner Delete Failed" });
@@ -165,7 +165,7 @@ const bannerDelete_get = async (req, res) => {
   }
 };
 
-module.exports = {
+export default {
   newBanner_get,
   banner_get,
   newBanner_post,

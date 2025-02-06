@@ -1,25 +1,21 @@
-const mongoose = require("mongoose");
-const User = require("../models/userModels.js");
-const Product = require("../models/productModel");
-const Cart = require("../models/cartModel");
-const Category = require("../models/categoryModel");
-const Banner = require("../models/bannerModel");
-const asyncHandler = require("express-async-handler");
-const {
-  sendOtp,
-  generateOTP,
-  sendVerifymail,
-} = require("../utility/nodeMailer.js");
+import mongoose from "mongoose";
+import { findById, findOne, create, updateOne, findByIdAndUpdate } from "../models/userModels.js";
+import { find, findById as _findById } from "../models/productModel";
+import Cart from "../models/cartModel";
+import { find as _find } from "../models/categoryModel";
+import { find as __find } from "../models/bannerModel";
+import asyncHandler from "express-async-handler";
+import { sendOtp, generateOTP, sendVerifymail } from "../utility/nodeMailer.js";
 
-const bcrypt = require("bcrypt");
-const randomstring = require("randomstring");
+import { hash } from "bcrypt";
+import { generate } from "randomstring";
 
 const loadlandingpage = async (req, res) => {
   try {
     const userId = req.session.user_id;
-    const user = await User.findById(userId);
-    const getalldata = await Product.find();
-    const allBanner = await Banner.find({ status: "active" });
+    const user = await findById(userId);
+    const getalldata = await find();
+    const allBanner = await __find({ status: "active" });
     res.render("./user/pages/index", { getalldata, user, allBanner });
   } catch (error) {
     throw new Error(error);
@@ -29,7 +25,7 @@ const loadlandingpage = async (req, res) => {
 const loaduserprofile = async (req, res) => {
   try {
     const userId = req.session.user_id;
-    const user = await User.findById(userId);
+    const user = await findById(userId);
 
     res.render("./user/pages/userprofile", { user });
   } catch (error) {
@@ -39,7 +35,7 @@ const loaduserprofile = async (req, res) => {
 
 async function editProfilePost(req, res) {
   const userId = req.session.user_id;
-  const user = await User.findOne({ _id: userId });
+  const user = await findOne({ _id: userId });
 
   const newuserName = req.body.username;
   const newEmail = req.body.email;
@@ -75,7 +71,7 @@ const loadregistration = async (req, res) => {
 const loadaboutpage = async (req, res) => {
   try {
     const userId = req.session.user_id;
-    const user = await User.findById(userId);
+    const user = await findById(userId);
     res.render("./user/pages/about", { user });
   } catch (error) {
     throw new Error(error);
@@ -99,7 +95,7 @@ const loadshoppage = async (req, res) => {
     const page = req.query.p || 1;
     const search = req.query.search || "";
 
-    const listedCategories = await Category.find({ isListed: true });
+    const listedCategories = await _find({ isListed: true });
     const categoryMapping = {};
 
     listedCategories.forEach((category) => {
@@ -153,20 +149,20 @@ const loadshoppage = async (req, res) => {
       ? { title: { $regex: search, $options: "i" } }
       : {};
 
-    const totalProducts = await Product.find({
+    const totalProducts = await find({
       ...filter,
       ...catfilter,
       ...searchFilter,
     }).countDocuments();
 
-    const products = await Product.find({
+    const products = await find({
       ...filter,
       ...catfilter,
       ...searchFilter,
     }).sort(sortQuery);
-    const getalldata = await Product.find();
+    const getalldata = await find();
 
-    const user = await User.findById(req.session.user_id);
+    const user = await findById(req.session.user_id);
 
     res.render("./user/pages/shop", {
       getalldata,
@@ -190,9 +186,9 @@ const loadproductdetail = async (req, res) => {
   try {
     const productId = req.query.id;
     const userId = req.session.user_id;
-    const user = await User.findById(userId);
+    const user = await findById(userId);
 
-    const getalldata = await Product.findById(productId);
+    const getalldata = await _findById(productId);
     if (!getalldata) {
       return res
         .status(404)
@@ -210,7 +206,7 @@ const loadproductdetail = async (req, res) => {
 const register = async (req, res) => {
   try {
     const emailCheck = req.body.email;
-    const checkData = await User.findOne({ email: emailCheck });
+    const checkData = await findOne({ email: emailCheck });
     if (checkData) {
       const user = req.session.user_id;
 
@@ -268,8 +264,8 @@ const verifyOTP = asyncHandler(async (req, res) => {
     let messages = "";
 
     if (enteredOTP == storedOTP) {
-      user.password = await bcrypt.hash(user.password, 10);
-      const newUser = await User.create(user);
+      user.password = await hash(user.password, 10);
+      const newUser = await create(user);
       delete req.session.otpUser.otp;
       res.redirect("/login");
     } else {
@@ -319,8 +315,8 @@ const verifyResendOTP = asyncHandler(async (req, res) => {
     const user = req.session.otpUser;
 
     if (enteredOTP == storedOTP.otp) {
-      user.password = await bcrypt.hash(user.password, 10);
-      const newUser = await User.create(user);
+      user.password = await hash(user.password, 10);
+      const newUser = await create(user);
       if (newUser) {
         console.log("new user insert in resend page", newUser);
       } else {
@@ -349,10 +345,10 @@ const forgetLoad = async (req, res) => {
 const forgetpswd = async (req, res) => {
   try {
     const email = req.body.email;
-    const user = await User.findOne({ email: email });
+    const user = await findOne({ email: email });
     if (user) {
-      const randomString = randomstring.generate();
-      const updateData = await User.updateOne(
+      const randomString = generate();
+      const updateData = await updateOne(
         { email: email },
         { $set: { token: randomString } }
       );
@@ -374,7 +370,7 @@ const forgetpswd = async (req, res) => {
 const forgetPswdload = async (req, res) => {
   try {
     const token = req.query.token;
-    const tokenData = await User.findOne({ token: token });
+    const tokenData = await findOne({ token: token });
     if (tokenData) {
       res.render("./user/pages/forget-password", { user_id: tokenData._id });
     }
@@ -385,7 +381,7 @@ const forgetPswdload = async (req, res) => {
 
 const securePassword = async (password) => {
   try {
-    const passwordHash = await bcrypt.hash(password, 10);
+    const passwordHash = await hash(password, 10);
     return passwordHash;
   } catch (error) {
     console.log(error.message);
@@ -399,7 +395,7 @@ const resetPswd = async (req, res) => {
     const user_id = req.body.user_id;
     const secure_password = await securePassword(password);
 
-    const updateData = await User.findByIdAndUpdate(
+    const updateData = await findByIdAndUpdate(
       { _id: user_id },
       { $set: { password: secure_password, token: "" } }
     );
@@ -415,8 +411,8 @@ const resetPswd = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const allBanner = await Banner.find({ status: "active" });
-    const user = await User.findOne({ email });
+    const allBanner = await __find({ status: "active" });
+    const user = await findOne({ email });
 
     if (!user) {
       const errorMessage = "Invalid username or password";
@@ -457,7 +453,7 @@ const userlogout = async (req, res) => {
   }
 };
 
-module.exports = {
+export default {
   loadloginpage,
   loadregistration,
   loadaboutpage,

@@ -1,19 +1,19 @@
-const Product = require("../models/productModel");
-const User = require("../models/userModels");
-const Cart = require("../models/cartModel");
-const Address = require("../models/addressModel");
-const userWallet = require("../models/walletModel");
-const coupons = require("../models/couponModel");
+import { findById } from "../models/productModel";
+import { findById as _findById, findOne } from "../models/userModels";
+import { find, findOne as _findOne, create } from "../models/cartModel";
+import { find as _find } from "../models/addressModel";
+import { findOne as __findOne } from "../models/walletModel";
+import { find as __find } from "../models/couponModel";
 
 const loadshopcartpage = async (req, res) => {
   try {
     const userId = req.session.user_id;
-    const user = await User.findById(userId);
+    const user = await _findById(userId);
     const error = req.session.insufficientstock
       ? req.session.insufficientstock
       : "";
     req.session.insufficientstock = "";
-    const getCart = await Cart.find({ user_id: user }).populate(
+    const getCart = await find({ user_id: user }).populate(
       "products.productId"
     );
     
@@ -51,14 +51,14 @@ const addToCart = async (req, res) => {
   try {
     const userId = req.session.user_id;
     const productId = req.body.productId;
-    const product = await Product.findById(productId);
+    const product = await findById(productId);
 
-    let cart = await Cart.findOne({ user_id: userId }).populate(
+    let cart = await _findOne({ user_id: userId }).populate(
       "products.productId"
     );
 
     if (!cart) {
-      cart = await Cart.create({ user_id: userId, products: [] });
+      cart = await create({ user_id: userId, products: [] });
     }
     const existingItem = cart.products.find((item) =>
       item.productId.equals(productId)
@@ -97,7 +97,7 @@ const removeProduct = async (req, res) => {
     const productId = req.query.id;
     const user = req.session.user_id;
 
-    const getCart = await Cart.findOne({ user_id: user });
+    const getCart = await _findOne({ user_id: user });
     if (getCart) {
       const productIndex = getCart.products.findIndex(
         (item) => item.productId.toString() === productId
@@ -134,8 +134,8 @@ const removeProduct = async (req, res) => {
 const loadCheckOutpage = async (req, res) => {
   try {
     const userId = req.session.user_id;
-    const user = await User.findById(userId);
-    const getCart = await Cart.find({ user_id: user }).populate(
+    const user = await _findById(userId);
+    const getCart = await find({ user_id: user }).populate(
       "products.productId"
     );
 
@@ -152,7 +152,7 @@ const loadCheckOutpage = async (req, res) => {
     }
 
     //collecting coupons
-    let allCoupons = await coupons.find({
+    let allCoupons = await __find({
       $and: [
         { usedBy: { $ne: userId } },
         { expiryDate: { $gt: new Date() } },
@@ -164,7 +164,7 @@ const loadCheckOutpage = async (req, res) => {
       ],
     });
     console.log("All coupons : ", allCoupons);
-    let userData = await User.findOne({ _id: userId })
+    let userData = await findOne({ _id: userId })
       .populate("coupons")
       .exec();
     let couponIds = new Set(allCoupons.map((coupon) => coupon.couponName));
@@ -176,10 +176,10 @@ const loadCheckOutpage = async (req, res) => {
       }
     });
 
-    let walletAmount = await userWallet.findOne({
+    let walletAmount = await __findOne({
       userId: req.session.user_id,
     });
-    const address = await Address.find({ user: userId });
+    const address = await _find({ user: userId });
     const total = getCart.reduce((acc, cart) => acc + cart.total, 0);
     res.render("./user/pages/checkOut", {
       getCart,
@@ -197,11 +197,11 @@ const loadCheckOutpage = async (req, res) => {
 const updateCart = async (req, res) => {
   try {
     const userId = req.session.user_id;
-    const user = await User.findById(userId);
+    const user = await _findById(userId);
     let updatedQuantity = req.body.quantity;
     const productId = req.body.productId;
 
-    const getCart = await Cart.findOne({ user_id: user._id }).populate(
+    const getCart = await _findOne({ user_id: user._id }).populate(
       "products.productId"
     );
 
@@ -250,7 +250,7 @@ const updateCart = async (req, res) => {
   }
 };
 
-module.exports = {
+export default {
   loadshopcartpage,
   addToCart,
   loadCheckOutpage,

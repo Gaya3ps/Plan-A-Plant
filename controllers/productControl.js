@@ -1,17 +1,17 @@
-const Product = require("../models/productModel");
-const Category = require("../models/categoryModel");
-const fs = require("fs");
-const expressHandler = require("express-async-handler");
-const { upload } = require("../config/upload");
-const sharp = require("sharp");
-const path = require("path");
-const mongoose = require("mongoose");
+import Product, { find, findByIdAndUpdate, findById } from "../models/productModel";
+import { find as _find, findById as _findById } from "../models/categoryModel";
+import fs from "fs";
+import expressHandler from "express-async-handler";
+import { upload } from "../config/upload";
+import sharp from "sharp";
+import { join } from "path";
+import mongoose from "mongoose";
 
 
 // productManagement
 const productManagement = expressHandler(async (req, res) => {
   try {
-    const findProduct = await Product.find().populate("categoryName");
+    const findProduct = await find().populate("categoryName");
     res.render("./admin/pages/productlist", {
       title: "Products",
       productList: findProduct,
@@ -24,7 +24,7 @@ const productManagement = expressHandler(async (req, res) => {
 // addProduct Page
 const addProduct = expressHandler(async (req, res) => {
   try {
-    const category = await Category.find({ isListed: true });
+    const category = await _find({ isListed: true });
     if (category) {
       res.render("./admin/pages/addProduct", {
         title: "addProduct",
@@ -51,7 +51,7 @@ const insertProduct = expressHandler(async (req, res) => {
 
     const secondaryImages = [];
     for (const e of req.files.secondaryImage) {
-      const croppedImage = path.join(
+      const croppedImage = join(
         __dirname,
         "../public/admin/uploads",
         `cropped_${e.filename}`
@@ -68,7 +68,7 @@ const insertProduct = expressHandler(async (req, res) => {
     }
     const { offer, productPrice, categoryName } = req.body;
 
-    const filteredCategory = await Category.findById({ _id: categoryName });
+    const filteredCategory = await _findById({ _id: categoryName });
 
     if (filteredCategory.categoryOffer > 0 && filteredCategory.categoryOffer > offer ) {
       offerPrice = (productPrice * filteredCategory.categoryOffer) / 100;
@@ -111,7 +111,7 @@ const insertProduct = expressHandler(async (req, res) => {
 const listProduct = expressHandler(async (req, res) => {
   try {
     const id = req.params.id;
-    const listing = await Product.findByIdAndUpdate(
+    const listing = await findByIdAndUpdate(
       { _id: id },
       { $set: { isListed: true } }
     );
@@ -126,7 +126,7 @@ const listProduct = expressHandler(async (req, res) => {
 const unListProduct = expressHandler(async (req, res) => {
   try {
     const id = req.params.id;
-    const listing = await Product.findByIdAndUpdate(
+    const listing = await findByIdAndUpdate(
       { _id: id },
       { $set: { isListed: false } }
     );
@@ -141,8 +141,8 @@ const editProductPage = expressHandler(async (req, res) => {
   try {
     const id = req.params.id;
 
-    const category = await Category.find({ isListed: true });
-    const productFound = await Product.findById(id)
+    const category = await _find({ isListed: true });
+    const productFound = await findById(id)
       .populate("categoryName")
       .exec();
 
@@ -163,7 +163,7 @@ const editProductPage = expressHandler(async (req, res) => {
 const updateProduct = expressHandler(async (req, res) => {
   try {
     const id = req.params.id;
-    const existingProduct = await Product.findById(id);
+    const existingProduct = await findById(id);
 
     
     let primaryImage;
@@ -227,7 +227,7 @@ const updateProduct = expressHandler(async (req, res) => {
       offer: req.body.offer,
     };
 
-    const updatedProduct = await Product.findByIdAndUpdate(id, editingProduct, {
+    const updatedProduct = await findByIdAndUpdate(id, editingProduct, {
       new: true,
     });
 
@@ -237,7 +237,7 @@ const updateProduct = expressHandler(async (req, res) => {
   }
 });
 
-module.exports = {
+export default {
   addProduct,
   insertProduct,
   productManagement,
