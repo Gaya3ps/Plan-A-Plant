@@ -1,10 +1,16 @@
 import mongoose from "mongoose";
-import { findById, findOne, create, updateOne, findByIdAndUpdate } from "../models/userModels.js";
-import { find, findById as _findById } from "../models/productModel";
-import Cart from "../models/cartModel";
-import { find as _find } from "../models/categoryModel";
-import { find as __find } from "../models/bannerModel";
-import asyncHandler from "express-async-handler";
+import {
+  findById,
+  findOne,
+  create,
+  updateOne,
+  findByIdAndUpdate,
+} from "../models/userModels.js";
+import { find, findById as _findById } from "../models/productModel.js";
+import Cart from "../models/cartModel.js";
+import { find as _find } from "../models/categoryModel.js";
+import { find as __find } from "../models/bannerModel.js";
+import asyncHandler from "express-async-handler.js";
 import { sendOtp, generateOTP, sendVerifymail } from "../utility/nodeMailer.js";
 
 import { hash } from "bcrypt";

@@ -1,12 +1,58 @@
 import { Router } from "express";
 const userRoute = Router();
-import { loadregistration, register, login, loadaboutpage, loadshoppage, loadcontactpage, loadloginpage, loadlandingpage, loadproductdetail, loaduserprofile, editProfilePost, forgetLoad, forgetpswd, forgetPswdload, resetPswd, sendOTPpage, verifyOTP, reSendOTP, verifyResendOTP, userlogout } from "../controllers/usercontroller";
-import { getAllAddress, addAddressPage, newAddress, editAddressPage, editAddress, deleteAddress } from "../controllers/addressController";
-import { isLogout, isLogin } from "../middleware/userAuth";
-import setErrorMessage from "../middleware/errormsg";
-import { loadshopcartpage, addToCart, removeProduct, updateCart, loadCheckOutpage } from "../controllers/cartController";
-import { confirmOrder, loadOrderList, loadorderDetailing, verifyPayment, cancelOrder, cancelOrderById, returnOrderById, acceptReturn, rejectReturn, addToWallet, loadWallet } from "../controllers/orderControl";
-import { generateInvoicePdf } from "../helper/pdfGenerator";
+import {
+  loadregistration,
+  register,
+  login,
+  loadaboutpage,
+  loadshoppage,
+  loadcontactpage,
+  loadloginpage,
+  loadlandingpage,
+  loadproductdetail,
+  loaduserprofile,
+  editProfilePost,
+  forgetLoad,
+  forgetpswd,
+  forgetPswdload,
+  resetPswd,
+  sendOTPpage,
+  verifyOTP,
+  reSendOTP,
+  verifyResendOTP,
+  userlogout,
+} from "../controllers/usercontroller.js";
+import {
+  getAllAddress,
+  addAddressPage,
+  newAddress,
+  editAddressPage,
+  editAddress,
+  deleteAddress,
+} from "../controllers/addressController.js";
+import { isLogout, isLogin } from "../middleware/userAuth.js";
+import setErrorMessage from "../middleware/errormsg.js";
+import {
+  loadshopcartpage,
+  addToCart,
+  removeProduct,
+  updateCart,
+  loadCheckOutpage,
+} from "../controllers/cartController.js";
+import {
+  confirmOrder,
+  loadOrderList,
+  loadorderDetailing,
+  verifyPayment,
+  cancelOrder,
+  cancelOrderById,
+  returnOrderById,
+  acceptReturn,
+  rejectReturn,
+  addToWallet,
+  loadWallet,
+} from "../controllers/orderControl.js";
+import { generateInvoicePdf } from "../helper/pdfGenerator.js";
 
 userRoute.use(setErrorMessage);
 
@@ -31,20 +77,12 @@ userRoute.get("/login", isLogout, loadloginpage);
 userRoute.get("/", loadlandingpage);
 userRoute.get("/product", loadproductdetail);
 userRoute.get("/userprofile", isLogin, loaduserprofile);
-userRoute.post(
-  "/userprofile",
-  isLogin,
-  editProfilePost
-);
+userRoute.post("/userprofile", isLogin, editProfilePost);
 
 // resetpassword
 userRoute.get("/forget", isLogout, forgetLoad);
 userRoute.post("/forget", isLogout, forgetpswd);
-userRoute.get(
-  "/forget-password",
-  isLogout,
-  forgetPswdload
-);
+userRoute.get("/forget-password", isLogout, forgetPswdload);
 userRoute.post("/forget-password", isLogout, resetPswd);
 
 userRoute.get("/otp", isLogout, sendOTPpage);
@@ -56,59 +94,33 @@ userRoute.get("/logout", isLogin, userlogout);
 
 //ADDRESS
 userRoute.get("/address", isLogin, getAllAddress);
-userRoute.get(
-  "/addAddress",
-  isLogin,
-  addAddressPage
-);
+userRoute.get("/addAddress", isLogin, addAddressPage);
 userRoute.post("/addAddress", isLogin, newAddress);
-userRoute.get(
-  "/editAddress",
-  isLogin,
-  editAddressPage
-);
+userRoute.get("/editAddress", isLogin, editAddressPage);
 userRoute.post("/editAddress", isLogin, editAddress);
-userRoute.get(
-  "/deleteAddress/:id",
-  isLogin,
-  deleteAddress
-);
+userRoute.get("/deleteAddress/:id", isLogin, deleteAddress);
 
 // Add to Cart
-userRoute.get(
-  "/shopingcart",
-  isLogin,
-  loadshopcartpage
-);
-userRoute.post("/shopingcart",isLogin, addToCart);
-userRoute.get("/removecart",isLogin, removeProduct);
+userRoute.get("/shopingcart", isLogin, loadshopcartpage);
+userRoute.post("/shopingcart", isLogin, addToCart);
+userRoute.get("/removecart", isLogin, removeProduct);
 
 //update cart
 userRoute.post("/updateCart", isLogin, updateCart);
 
 //checkOut
 userRoute.get("/checkOut", isLogin, loadCheckOutpage);
-userRoute.post(
-  "/confirm-order",
-  isLogin,
-  confirmOrder
-);
+userRoute.post("/confirm-order", isLogin, confirmOrder);
 userRoute.get("/orderList", isLogin, loadOrderList);
 userRoute.get("/orderDetailing", loadorderDetailing);
 userRoute.get("/invoice", generateInvoicePdf);
-userRoute.post(
-  "/verify-payment",
-  isLogin,
-  verifyPayment
-);
+userRoute.post("/verify-payment", isLogin, verifyPayment);
 // order
 userRoute.get("/cancelOrder/:id", cancelOrder);
 userRoute.post("/cancelSingleOrder", cancelOrderById);
 userRoute.post("/requestReturn", returnOrderById);
 userRoute.post("/acceptReturn/:id", acceptReturn);
 userRoute.post("/rejectReturn/:id", rejectReturn);
-
-
 
 userRoute.post("/addToWallet", isLogin, addToWallet);
 

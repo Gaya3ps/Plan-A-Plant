@@ -1,12 +1,15 @@
-import Product, { find, findByIdAndUpdate, findById } from "../models/productModel";
-import { find as _find, findById as _findById } from "../models/categoryModel";
+import Product, {
+  find,
+  findByIdAndUpdate,
+  findById,
+} from "../models/productModel.js";
+import { find as _find, findById as _findById } from "../models/categoryModel.js";
 import fs from "fs";
 import expressHandler from "express-async-handler";
-import { upload } from "../config/upload";
+import { upload } from "../config/upload.js";
 import sharp from "sharp";
 import { join } from "path";
 import mongoose from "mongoose";
-
 
 // productManagement
 const productManagement = expressHandler(async (req, res) => {
@@ -35,9 +38,6 @@ const addProduct = expressHandler(async (req, res) => {
     throw new Error(error);
   }
 });
-
-
-
 
 const insertProduct = expressHandler(async (req, res) => {
   try {
@@ -70,7 +70,10 @@ const insertProduct = expressHandler(async (req, res) => {
 
     const filteredCategory = await _findById({ _id: categoryName });
 
-    if (filteredCategory.categoryOffer > 0 && filteredCategory.categoryOffer > offer ) {
+    if (
+      filteredCategory.categoryOffer > 0 &&
+      filteredCategory.categoryOffer > offer
+    ) {
       offerPrice = (productPrice * filteredCategory.categoryOffer) / 100;
       console.log(offerPrice);
       discountAmount = productPrice - offerPrice;
@@ -142,12 +145,7 @@ const editProductPage = expressHandler(async (req, res) => {
     const id = req.params.id;
 
     const category = await _find({ isListed: true });
-    const productFound = await findById(id)
-      .populate("categoryName")
-      .exec();
-
-
-
+    const productFound = await findById(id).populate("categoryName").exec();
 
     if (productFound) {
       res.render("./admin/pages/editProduct", {
@@ -165,7 +163,6 @@ const updateProduct = expressHandler(async (req, res) => {
     const id = req.params.id;
     const existingProduct = await findById(id);
 
-    
     let primaryImage;
     if (req.files.primaryImage) {
       const primaryImageFile = req.files.primaryImage[0];
@@ -177,7 +174,6 @@ const updateProduct = expressHandler(async (req, res) => {
       primaryImage = existingProduct.primaryImage[0];
     }
 
- 
     const deleteSecondaryImages = req.body.deleteSecondaryImage;
     const dbImage = [];
 
@@ -244,5 +240,5 @@ export default {
   listProduct,
   unListProduct,
   editProductPage,
-  updateProduct
+  updateProduct,
 };

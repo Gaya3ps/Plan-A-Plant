@@ -1,9 +1,9 @@
-import { findById } from "../models/productModel";
-import { findById as _findById, findOne } from "../models/userModels";
-import { find, findOne as _findOne, create } from "../models/cartModel";
-import { find as _find } from "../models/addressModel";
-import { findOne as __findOne } from "../models/walletModel";
-import { find as __find } from "../models/couponModel";
+import { findById } from "../models/productModel.js";
+import { findById as _findById, findOne } from "../models/userModels.js";
+import { find, findOne as _findOne, create } from "../models/cartModel.js";
+import { find as _find } from "../models/addressModel.js";
+import { findOne as __findOne } from "../models/walletModel.js";
+import { find as __find } from "../models/couponModel.js";
 
 const loadshopcartpage = async (req, res) => {
   try {
@@ -16,7 +16,6 @@ const loadshopcartpage = async (req, res) => {
     const getCart = await find({ user_id: user }).populate(
       "products.productId"
     );
-    
 
     let total = 0;
 
@@ -63,14 +62,12 @@ const addToCart = async (req, res) => {
     const existingItem = cart.products.find((item) =>
       item.productId.equals(productId)
     );
-    
 
     if (existingItem) {
       existingItem.quantity += 1;
       existingItem.subTotal = existingItem.quantity * product.salePrice;
       if (existingItem.quantity > product.quantity) {
         existingItem.quantity = product.quantity;
-        
       }
     } else {
       cart.products.push({
@@ -78,7 +75,6 @@ const addToCart = async (req, res) => {
         quantity: 1,
         subTotal: product.salePrice,
       });
-     
     }
 
     cart.total = cart.products.reduce((acc, item) => {
@@ -164,9 +160,7 @@ const loadCheckOutpage = async (req, res) => {
       ],
     });
     console.log("All coupons : ", allCoupons);
-    let userData = await findOne({ _id: userId })
-      .populate("coupons")
-      .exec();
+    let userData = await findOne({ _id: userId }).populate("coupons").exec();
     let couponIds = new Set(allCoupons.map((coupon) => coupon.couponName));
     console.log(" coupon ids : ", couponIds);
     userData.coupons.filter((coupon) => {
@@ -255,5 +249,5 @@ export default {
   addToCart,
   loadCheckOutpage,
   removeProduct,
-  updateCart
+  updateCart,
 };

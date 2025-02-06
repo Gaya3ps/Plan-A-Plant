@@ -1,12 +1,28 @@
-import { countDocuments, findOne, find, findById } from "../models/userModels";
+import {
+  countDocuments,
+  findOne,
+  find,
+  findById,
+} from "../models/userModels.js";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-import { find as _find, aggregate, countDocuments as _countDocuments, findById as _findById, findByIdAndUpdate } from "../models/orderModel";
-import Address from "../models/addressModel";
+import {
+  find as _find,
+  aggregate,
+  countDocuments as _countDocuments,
+  findById as _findById,
+  findByIdAndUpdate,
+} from "../models/orderModel.js";
+import Address from "../models/addressModel.js";
 import numeral from "numeral";
 import moment from "moment";
-import Product from "../models/productModel";
-import { find as __find, countDocuments as __countDocuments, findOne as _findOne, create } from "../models/couponModel";
+import Product from "../models/productModel.js";
+import {
+  find as __find,
+  countDocuments as __countDocuments,
+  findOne as _findOne,
+  create,
+} from "../models/couponModel.js";
 
 const loadLogin = async (req, res) => {
   try {
@@ -29,28 +45,25 @@ const loadDashboard = async (req, res) => {
       .select("orderDate grandTotal")
       .sort({ _id: -1 });
 
-
     let totalSalesAmount = 0;
 
     recentOrders.forEach((order) => {
       totalSalesAmount += order.grandTotal;
     });
 
-    
-
     totalSalesAmount = numeral(totalSalesAmount).format("0.0a");
     const totalSoldProducts = await aggregate([
       {
-        $match: { status: "Delivered" }, 
+        $match: { status: "Delivered" },
       },
       {
-        $unwind: "$products", 
+        $unwind: "$products",
       },
       {
         $group: {
           _id: null,
           total_sold_count: {
-            $sum: "$products.quantity", 
+            $sum: "$products.quantity",
           },
         },
       },
@@ -114,20 +127,19 @@ const loadorderdetails = async (req, res) => {
       .populate("address")
       .populate("products.product")
       .populate("user");
-      if (!order) {
-        return res.status(404).render("./admin/pages/404", { title: "404" });
-      }
-      res.render("./admin/pages/orderdetails", { title: "order", order });
-    } catch (error) {
-      console.error(error);
-      res.status(404).render("./admin/pages/404", { title: "404" });
+    if (!order) {
+      return res.status(404).render("./admin/pages/404", { title: "404" });
     }
-  };
+    res.render("./admin/pages/orderdetails", { title: "order", order });
+  } catch (error) {
+    console.error(error);
+    res.status(404).render("./admin/pages/404", { title: "404" });
+  }
+};
 
 const OrderStatusupdate = async (req, res) => {
   const orderId = req.params.id;
   const newStatus = req.body.status;
- 
 
   try {
     const order = await findByIdAndUpdate(
@@ -422,15 +434,14 @@ const addCoupon = async (req, res) => {
 
 const insertCoupon = async (req, res) => {
   const couponName = req.body.couponName;
- const existingCoupon = await _findOne({ couponName });
+  const existingCoupon = await _findOne({ couponName });
 
- if (existingCoupon) {
-  return res.render("./admin/pages/addCoupon", {
-    title: "Add New Coupon",
-    alert: "Coupon '" + couponName + "' already exists.",
-  });
-}
-
+  if (existingCoupon) {
+    return res.render("./admin/pages/addCoupon", {
+      title: "Add New Coupon",
+      alert: "Coupon '" + couponName + "' already exists.",
+    });
+  }
 
   await create(req.body);
   res.render("./admin/pages/addCoupon", {
@@ -439,7 +450,6 @@ const insertCoupon = async (req, res) => {
   });
   res.end();
 };
-
 
 //functions
 function convertDateAndTime(dateString) {
@@ -468,8 +478,6 @@ function convertDateAndTime(dateString) {
   return { day, time, dayOfWeek, dateString };
 }
 
-
-
 export default {
   loadDashboard,
   loadproductlist,
@@ -489,5 +497,5 @@ export default {
   getSalesDataWeekly,
   manageCoupons,
   addCoupon,
-  insertCoupon
+  insertCoupon,
 };

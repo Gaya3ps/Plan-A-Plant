@@ -1,7 +1,7 @@
 import PDFDocument from "pdfkit";
-import { findOne } from "../models/orderModel";
-import { findById } from "../models/userModels";
-import productModel from "../models/productModel";
+import { findOne } from "../models/orderModel.js";
+import { findById } from "../models/userModels.js";
+import productModel from "../models/productModel.js";
 
 const generateInvoicePdf = async (req, res) => {
   try {

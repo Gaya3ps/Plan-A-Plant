@@ -1,6 +1,6 @@
 import { default as mongoose } from "mongoose";
-import { find, create, findById, findByIdAndUpdate, findOneAndDelete } from "../models/addressModel";
-import { findById as _findById } from "../models/userModels";
+import { find, create, findById, findByIdAndUpdate, findOneAndDelete } from "../models/addressModel.js";
+import { findById as _findById } from "../models/userModels.js";
 import asyncHandler from "express-async-handler";
 
 const getAllAddress = asyncHandler(async (req, res) => {

@@ -1,4 +1,9 @@
-import Banner, { find, findById, findByIdAndUpdate, findOneAndDelete } from "../models/bannerModel";
+import Banner, {
+  find,
+  findById,
+  findByIdAndUpdate,
+  findOneAndDelete,
+} from "../models/bannerModel.js";
 
 function newformatDate(date) {
   const day = String(date.getDate()).padStart(2, "0");
@@ -36,7 +41,6 @@ const newBanner_get = (req, res) => {
 };
 
 const newBanner_post = async (req, res) => {
-
   try {
     const {
       banner_title,

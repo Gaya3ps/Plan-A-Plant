@@ -19,7 +19,7 @@ import {
   manageCoupons,
   addCoupon,
   insertCoupon,
-} from "../controllers/admincontroller";
+} from "../controllers/admincontroller.js";
 import {
   addProduct,
   insertProduct,
@@ -28,8 +28,8 @@ import {
   unListProduct,
   editProductPage,
   updateProduct,
-} from "../controllers/productControl";
-import { isLogout, isLogin } from "../middleware/adminAuth";
+} from "../controllers/productControl.js";
+import { isLogout, isLogin } from "../middleware/adminAuth.js";
 import {
   categoryManagement,
   addCategory,
@@ -39,8 +39,8 @@ import {
   editCategory,
   updateCategory,
   searchCategory,
-} from "../controllers/categoryControl";
-import { upload } from "../config/upload";
+} from "../controllers/categoryControl.js";
+import { upload } from "../config/upload.js";
 import {
   banner_get,
   newBanner_get,
@@ -48,7 +48,7 @@ import {
   bannerEdit_get,
   bannerEdit_post,
   bannerDelete_get,
-} from "../controllers/bannerController";
+} from "../controllers/bannerController.js";
 
 import dotenv from "dotenv";
 dotenv.config();

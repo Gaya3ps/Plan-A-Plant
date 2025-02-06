@@ -1,5 +1,13 @@
-import category, { find, findOne, findByIdAndUpdate, findById } from "../models/categoryModel";
-import { find as _find, findByIdAndUpdate as _findByIdAndUpdate } from "../models/productModel";
+import category, {
+  find,
+  findOne,
+  findByIdAndUpdate,
+  findById,
+} from "../models/categoryModel.js";
+import {
+  find as _find,
+  findByIdAndUpdate as _findByIdAndUpdate,
+} from "../models/productModel.js";
 import expressHandler from "express-async-handler";
 
 // category page
@@ -114,7 +122,6 @@ const updateCategoryAndProductPrices = async (categoryId, newCategoryOffer) => {
       newCategoryOffer = 0;
     }
 
-   
     await findByIdAndUpdate(categoryId, { categoryOffer: newCategoryOffer });
 
     const products = await _find({ categoryName: categoryId });
@@ -124,7 +131,10 @@ const updateCategoryAndProductPrices = async (categoryId, newCategoryOffer) => {
 
       const higherOffer = Math.max(newCategoryOffer, productOffer);
 
-      let salePrice = higherOffer > 0 ? product.productPrice - (product.productPrice * higherOffer) / 100 : product.productPrice;
+      let salePrice =
+        higherOffer > 0
+          ? product.productPrice - (product.productPrice * higherOffer) / 100
+          : product.productPrice;
 
       await _findByIdAndUpdate(product._id, { salePrice: salePrice });
     }

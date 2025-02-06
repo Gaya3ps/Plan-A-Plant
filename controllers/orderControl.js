@@ -1,17 +1,30 @@
-import { updateOne, findById } from "../models/userModels";
-import { findByIdAndUpdate, findById as _findById } from "../models/productModel";
-import Category from "../models/categoryModel";
-import { findOne, findOneAndUpdate } from "../models/cartModel";
-import Address from "../models/addressModel";
-import { insertMany, create, find, findOne as _findOne, findById as __findById, findByIdAndUpdate as _findByIdAndUpdate } from "../models/orderModel";
-import { findOne as __findOne } from "../models/couponModel";
+import { updateOne, findById } from "../models/userModels.js";
+import {
+  findByIdAndUpdate,
+  findById as _findById,
+} from "../models/productModel.js";
+import Category from "../models/categoryModel.js";
+import { findOne, findOneAndUpdate } from "../models/cartModel.js";
+import Address from "../models/addressModel.js";
+import {
+  insertMany,
+  create,
+  find,
+  findOne as _findOne,
+  findById as __findById,
+  findByIdAndUpdate as _findByIdAndUpdate,
+} from "../models/orderModel.js";
+import { findOne as __findOne } from "../models/couponModel.js";
 import dotenv from "dotenv";
 dotenv.config();
 
 import Razorpay from "razorpay";
-import { findOne as ___findOne, updateOne as _updateOne, create as _create } from "../models/walletModel";
-import verifyOrderPayment from "../helper/razorpay";
-
+import {
+  findOne as ___findOne,
+  updateOne as _updateOne,
+  create as _create,
+} from "../models/walletModel.js";
+import verifyOrderPayment from "../helper/razorpay.js";
 
 const razorpay = new Razorpay({
   key_id: process.env.key_id,
@@ -83,7 +96,6 @@ const confirmOrder = async (req, res) => {
         { $set: { products: [], total: 0 } }
       );
 
-    
       if (order.paymentMethod === "wallet") {
         const wallet = await ___findOne({ userId: userId });
 
@@ -98,7 +110,7 @@ const confirmOrder = async (req, res) => {
           orderId: orderData[0]._id,
           date: orderData[0].orderDate,
         };
-     
+
         await _updateOne(
           { userId: userId },
           {
@@ -109,7 +121,6 @@ const confirmOrder = async (req, res) => {
           }
         );
 
-       
         await updateOne(
           { _id: userId },
           { $inc: { wallet: -order.grandTotal } }
@@ -118,10 +129,10 @@ const confirmOrder = async (req, res) => {
       return res.status(200).json({ message: "success" });
     } else if (order.paymentMethod === "razorpay") {
       const razorpayOrder = await razorpay.orders.create({
-        amount: order.grandTotal * 100, 
+        amount: order.grandTotal * 100,
         currency: "INR",
         receipt: "orderId",
-        payment_capture: 1, 
+        payment_capture: 1,
       });
       res.status(200).json({
         message: "success",
@@ -187,7 +198,6 @@ const verifyPayment = async (req, res) => {
   }
 };
 
-
 //add refund amount to wallet
 const addToWallet = async (req, res) => {
   try {
@@ -243,7 +253,7 @@ const loadOrderList = async (req, res) => {
         path: "products.product",
         select: "primaryImage",
       })
-      .sort({ orderDate: -1 }) 
+      .sort({ orderDate: -1 })
       .exec();
 
     res.render("./user/pages/orderDetails", { orderDetails, user });
@@ -309,7 +319,6 @@ const cancelOrderById = async (req, res, next) => {
         return item.returnStatus === "Pending" ? false : true;
       })
     ) {
-    
       for (const item of order.products) {
         const updatedOrderItem = await _findByIdAndUpdate(
           item._id,
@@ -337,7 +346,6 @@ const cancelOrderById = async (req, res, next) => {
         return item.returnStatus === "Pending" ? false : true;
       })
     ) {
-   
       for (const item of order.products) {
         const updatedOrderItem = await _findByIdAndUpdate(
           item._id,
@@ -372,27 +380,22 @@ const returnOrderById = async (req, res, next) => {
     const orderId = req.body.orderId;
     const order = await __findById(orderId).populate("products.product");
 
-   
     if (order.products.every((item) => item.returnStatus === "Cancelled")) {
       return res
         .status(400)
         .json({ status: false, message: "Order is already cancelled" });
     }
 
-  
     const paymentCompleted = order.products.every(
       (item) => item.returnStatus !== "Delivered"
     );
     if (!paymentCompleted) {
-      return res
-        .status(400)
-        .json({
-          status: false,
-          message: "Payment not completed for all items",
-        });
+      return res.status(400).json({
+        status: false,
+        message: "Payment not completed for all items",
+      });
     }
 
-   
     for (const item of order.products) {
       const updatedOrderItem = await _findByIdAndUpdate(
         item._id,
@@ -400,9 +403,8 @@ const returnOrderById = async (req, res, next) => {
         { new: true }
       );
 
-      
       const returnedProduct = await _findById(item.product);
-    
+
       await returnedProduct.save();
     }
 
@@ -433,7 +435,6 @@ const rejectReturn = async (req, res) => {
     res.status(500).json({ status: false, error: "Internal Server Error" });
   }
 };
-
 
 const rejectReturnById = async (orderId) => {
   try {
@@ -468,7 +469,6 @@ const acceptReturn = async (req, res) => {
   }
 };
 
-
 const acceptReturnById = async (orderId, userId) => {
   try {
     const order = await __findById(orderId);
@@ -477,26 +477,22 @@ const acceptReturnById = async (orderId, userId) => {
       return "Order not found";
     }
 
-   
     if (order.status === "Return Accepted") {
       return "Return is already accepted";
     }
 
-    
     if (
       order.paymentMethod === "razorpay" ||
       order.paymentMethod === "wallet"
     ) {
       const refundAmount = order.grandTotal;
-      await refundToWallet(order.user, refundAmount, orderId, userId); 
+      await refundToWallet(order.user, refundAmount, orderId, userId);
 
-     
       order.status = "Return Accepted";
       await order.save();
 
       return "Return Accepted and amount refunded to wallet";
     } else {
-     
       order.status = "Return Accepted";
       await order.save();
 
@@ -507,7 +503,6 @@ const acceptReturnById = async (orderId, userId) => {
   }
 };
 
-
 const calculateRefundAmount = (products) => {
   let refundAmount = 0;
   for (const item of products) {
@@ -516,33 +511,30 @@ const calculateRefundAmount = (products) => {
   return refundAmount;
 };
 
-
 const refundToWallet = async (userId, refundAmount, orderId, username) => {
   try {
-    
     const wallet = await ___findOne({ userId });
 
     if (wallet) {
-      
       wallet.balance += refundAmount;
       wallet.income.push({
         amount: refundAmount,
-        orderId: orderId, 
+        orderId: orderId,
         date: new Date(),
         description: "Refund from return acceptance",
       });
-      wallet.username = username; 
+      wallet.username = username;
       await wallet.save();
     } else {
       // Create a new wallet entry if the user doesn't have a wallet yet
       await _create({
         userId,
-        username: username, 
+        username: username,
         balance: refundAmount,
         income: [
           {
             amount: refundAmount,
-            orderId: orderId, 
+            orderId: orderId,
             date: new Date(),
             description: "Refund from return acceptance",
           },
@@ -560,20 +552,15 @@ const loadWallet = async (req, res) => {
     const userId = req.session.user_id;
     const user = await findById(userId);
 
-    
     const { incomePage, expensePage } = req.query;
 
-    
     const incomePageNumber = parseInt(incomePage, 10) || 1;
     const expensePageNumber = parseInt(expensePage, 10) || 1;
 
-   
     const itemsPerPage = 2;
 
-   
     const wallet = await ___findOne({ userId: req.session.user_id });
 
-   
     const startIndexIncome = (incomePageNumber - 1) * itemsPerPage;
     const endIndexIncome = startIndexIncome + itemsPerPage;
     const paginatedIncome =
@@ -584,7 +571,6 @@ const loadWallet = async (req, res) => {
     const paginatedExpense =
       wallet?.expense.slice(startIndexExpense, endIndexExpense) || [];
 
-   
     const totalIncomePages = Math.ceil(
       (wallet?.income.length || 0) / itemsPerPage
     );
@@ -592,7 +578,6 @@ const loadWallet = async (req, res) => {
       (wallet?.expense.length || 0) / itemsPerPage
     );
 
-   
     res.render("user/pages/wallet", {
       title: "My Wallet",
       wallet: wallet?.balance || 0,
