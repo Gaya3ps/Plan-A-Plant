@@ -1,4 +1,4 @@
-const transporter = require("../config/emailSender"); // Import the Nodemailer transporter
+const transporter = require("../config/emailSender");
 
 function generateOTP() {
   const min = 1000;
