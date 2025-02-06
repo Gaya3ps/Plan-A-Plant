@@ -1,13 +1,57 @@
 import { Router } from "express";
 const adminRoute = Router();
-import { loadLogin, adminPanel, loadDashboard, adminlogout, userManagement, searchUser, useraction, loadorders, loadorderdetails, OrderStatusupdate, salesReportpage, generateSalesReport, getSalesData, getSalesDataWeekly, getSalesDataYearly, manageCoupons, addCoupon, insertCoupon } from "../controllers/admincontroller";
-import { addProduct, insertProduct, productManagement, listProduct, unListProduct, editProductPage, updateProduct } from "../controllers/productControl";
+import {
+  loadLogin,
+  adminPanel,
+  loadDashboard,
+  adminlogout,
+  userManagement,
+  searchUser,
+  useraction,
+  loadorders,
+  loadorderdetails,
+  OrderStatusupdate,
+  salesReportpage,
+  generateSalesReport,
+  getSalesData,
+  getSalesDataWeekly,
+  getSalesDataYearly,
+  manageCoupons,
+  addCoupon,
+  insertCoupon,
+} from "../controllers/admincontroller";
+import {
+  addProduct,
+  insertProduct,
+  productManagement,
+  listProduct,
+  unListProduct,
+  editProductPage,
+  updateProduct,
+} from "../controllers/productControl";
 import { isLogout, isLogin } from "../middleware/adminAuth";
-import { categoryManagement, addCategory, insertCategory, list, unList, editCategory, updateCategory, searchCategory } from "../controllers/categoryControl";
+import {
+  categoryManagement,
+  addCategory,
+  insertCategory,
+  list,
+  unList,
+  editCategory,
+  updateCategory,
+  searchCategory,
+} from "../controllers/categoryControl";
 import { upload } from "../config/upload";
-import { banner_get, newBanner_get, newBanner_post, bannerEdit_get, bannerEdit_post, bannerDelete_get } from "../controllers/bannerController";
+import {
+  banner_get,
+  newBanner_get,
+  newBanner_post,
+  bannerEdit_get,
+  bannerEdit_post,
+  bannerDelete_get,
+} from "../controllers/bannerController";
 
-require("dotenv").config();
+import dotenv from "dotenv";
+dotenv.config();
 
 adminRoute.use((req, res, next) => {
   req.app.set("layout", "admin/layout/admin");
@@ -27,53 +71,17 @@ adminRoute.post("/user", isLogin, searchUser);
 adminRoute.get("/useractions", isLogin, useraction);
 
 // categoryManagement---
-adminRoute.get(
-  "/category",
-  isLogin,
-  categoryManagement
-);
-adminRoute.get(
-  "/addCategory",
-  isLogin,
-  addCategory
-);
-adminRoute.post(
-  "/addCategory",
-  isLogin,
-  insertCategory
-);
-adminRoute.get(
-  "/category/list/:id",
-  isLogin,
-  list
-);
-adminRoute.get(
-  "/category/unList/:id",
-  isLogin,
-  unList
-);
-adminRoute.get(
-  "/editCategory/:id",
-  isLogin,
-  editCategory
-);
-adminRoute.post(
-  "/editCategory/:id",
-  isLogin,
-  updateCategory
-);
-adminRoute.post(
-  "/category/search",
-  isLogin,
-  searchCategory
-);
+adminRoute.get("/category", isLogin, categoryManagement);
+adminRoute.get("/addCategory", isLogin, addCategory);
+adminRoute.post("/addCategory", isLogin, insertCategory);
+adminRoute.get("/category/list/:id", isLogin, list);
+adminRoute.get("/category/unList/:id", isLogin, unList);
+adminRoute.get("/editCategory/:id", isLogin, editCategory);
+adminRoute.post("/editCategory/:id", isLogin, updateCategory);
+adminRoute.post("/category/search", isLogin, searchCategory);
 
 // Product Management---
-adminRoute.get(
-  "/product/addProduct",
-  isLogin,
-  addProduct
-);
+adminRoute.get("/product/addProduct", isLogin, addProduct);
 
 adminRoute.post(
   "/product/addProduct",
@@ -84,26 +92,10 @@ adminRoute.post(
   insertProduct
 ); /** Product adding and multer using  **/
 
-adminRoute.get(
-  "/product",
-  isLogin,
-  productManagement
-);
-adminRoute.post(
-  "/product/list/:id",
-  isLogin,
-  listProduct
-);
-adminRoute.post(
-  "/product/unList/:id",
-  isLogin,
-  unListProduct
-);
-adminRoute.get(
-  "/product/editproduct/:id",
-  isLogin,
-  editProductPage
-);
+adminRoute.get("/product", isLogin, productManagement);
+adminRoute.post("/product/list/:id", isLogin, listProduct);
+adminRoute.post("/product/unList/:id", isLogin, unListProduct);
+adminRoute.get("/product/editproduct/:id", isLogin, editProductPage);
 adminRoute.post(
   "/product/editproduct/:id",
   upload.fields([
@@ -115,46 +107,18 @@ adminRoute.post(
 
 // order
 adminRoute.get("/orders", isLogin, loadorders);
-adminRoute.get(
-  "/orderdetails/:id",
-  isLogin,
-  loadorderdetails
-);
-adminRoute.post(
-  "/orderdetails/update/:id",
-  isLogin,
-  OrderStatusupdate
-);
+adminRoute.get("/orderdetails/:id", isLogin, loadorderdetails);
+adminRoute.post("/orderdetails/update/:id", isLogin, OrderStatusupdate);
 
 //salesreport
-adminRoute.get(
-  "/salesreport",
-  isLogin,
-  salesReportpage
-);
-adminRoute.get(
-  "/get/sales-report",
-  isLogin,
-  generateSalesReport
-);
+adminRoute.get("/salesreport", isLogin, salesReportpage);
+adminRoute.get("/get/sales-report", isLogin, generateSalesReport);
 adminRoute.get("/sales-data", isLogin, getSalesData);
-adminRoute.get(
-  "/sales-data/weekly",
-  isLogin,
-  getSalesDataWeekly
-);
-adminRoute.get(
-  "/sales-data/yearly",
-  isLogin,
-  getSalesDataYearly
-);
+adminRoute.get("/sales-data/weekly", isLogin, getSalesDataWeekly);
+adminRoute.get("/sales-data/yearly", isLogin, getSalesDataYearly);
 
 //Manage Coupons
-adminRoute.get(
-  "/manageCoupons/:page",
-  isLogin,
-  manageCoupons
-);
+adminRoute.get("/manageCoupons/:page", isLogin, manageCoupons);
 adminRoute.get("/addCoupon", isLogin, addCoupon);
 adminRoute.post("/addCoupon", isLogin, insertCoupon);
 

@@ -1,6 +1,8 @@
 // DataBase connnection settings---
 import { connect, connection } from 'mongoose';
-require('dotenv').config();
+import dotenv from "dotenv";
+dotenv.config();
+
 
 const dbConnect = () => {
     connect(process.env.MONGO_URL, {

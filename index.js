@@ -1,18 +1,15 @@
-import express, { urlencoded, json, static } from "express";
+import express from "express";
+const { urlencoded, json } = express;
+const staticMiddleware = express.static;
 const app = express();
-import bcrypt from "bcrypt";
-import mongoose from "mongoose";
-import path from "path";
 const PORT = 8000;
 import userRoute from "./routes/userroute";
 import expressLayout from "express-ejs-layouts";
 import adminRoute from "./routes/adminroute";
 import { dbConnect } from "./config/database";
-import bodyParser from "body-parser";
 require("dotenv").config();
 import flash from "connect-flash";
 import session from "express-session";
-import nocache from "nocache";
 
 app.use((req, res, next) => {
   res.set("Cache-Control", "no-store");
@@ -24,8 +21,8 @@ app.use(json());
 app.set("view engine", "ejs");
 app.set("views", "./views");
 
-app.use(static("public"));
-app.use("/admin", static(__dirname + "/public"));
+app.use(staticMiddleware("public"));
+app.use("/admin", staticMiddleware(__dirname + "/public"));
 app.use(expressLayout);
 // res.header('Cache-Control', 'no-store, no-cache, must-revalidate, private');
 // app.use(nocache);
@@ -57,16 +54,17 @@ app.use("/", userRoute);
 app.use((req, res, next) => {
   // For admin routes
   if (req.url.startsWith("/admin")) {
-    res.status(404).render("./admin/pages/404", { title: "404", includeHeaderFooter: false });
+    res.status(404).render("./admin/pages/404", {
+      title: "404",
+      includeHeaderFooter: false,
+    });
   }
   // For user routes
   else {
-    res
-      .status(404)
-      .render("./user/pages/404", {
-        title: "404 Not Found",
-        includeHeaderFooter: false,
-      });
+    res.status(404).render("./user/pages/404", {
+      title: "404 Not Found",
+      includeHeaderFooter: false,
+    });
   }
 });
 

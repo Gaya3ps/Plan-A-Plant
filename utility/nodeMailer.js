@@ -1,4 +1,4 @@
-const transporter = require("../config/emailSender");
+import transporter from "../config/emailSender.js"
 function generateOTP() {
   const min = 1000;
   const max = 9999;
@@ -58,7 +58,7 @@ function sendOtp(email, otp, name) {
     html: htmlMessage,
   };
 
-  sendMail(mailOptions, (error, info) => {
+  transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
       console.error("Error sending OTP:", error);
     } else {
@@ -120,7 +120,7 @@ function sendVerifymail(name, email, token) {
     html: htmlMessage,
   };
 
-  sendMail(mailOptions, (error, info) => {
+  transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
       console.error("Error sending email:", error);
     } else {

@@ -5,7 +5,9 @@ import { findOne, findOneAndUpdate } from "../models/cartModel";
 import Address from "../models/addressModel";
 import { insertMany, create, find, findOne as _findOne, findById as __findById, findByIdAndUpdate as _findByIdAndUpdate } from "../models/orderModel";
 import { findOne as __findOne } from "../models/couponModel";
-require("dotenv").config();
+import dotenv from "dotenv";
+dotenv.config();
+
 import Razorpay from "razorpay";
 import { findOne as ___findOne, updateOne as _updateOne, create as _create } from "../models/walletModel";
 import verifyOrderPayment from "../helper/razorpay";

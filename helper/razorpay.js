@@ -1,10 +1,12 @@
-require("dotenv").config();
+import dotenv from "dotenv";
+dotenv.config();
+import crypto from "crypto"
+
 import Razorpay from "razorpay";
 
 export default (details) => {
   return new Promise((resolve, reject) => {
     try {
-      const crypto = require("crypto");
       let hmac = crypto.createHmac("sha256", process.env.key_secret);
       hmac.update(
         details.payment.razorpay_order_id +
