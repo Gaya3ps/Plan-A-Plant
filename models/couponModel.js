@@ -1,5 +1,4 @@
 import { Schema, model } from "mongoose";
-import FlexApiBase from "twilio/lib/rest/FlexApiBase";
 
 const couponSchema = Schema(
   {
