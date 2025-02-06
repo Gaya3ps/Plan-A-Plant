@@ -1,4 +1,4 @@
-const transporter = require("../config/emailSender");
+import { sendMail } from "../config/emailSender";
 
 function generateOTP() {
   const min = 1000;
@@ -59,7 +59,7 @@ function sendOtp(email, otp, name) {
     html: htmlMessage,
   };
 
-  transporter.sendMail(mailOptions, (error, info) => {
+  sendMail(mailOptions, (error, info) => {
     if (error) {
       console.error("Error sending OTP:", error);
     } else {
@@ -121,7 +121,7 @@ function sendVerifymail(name, email, token) {
     html: htmlMessage,
   };
 
-  transporter.sendMail(mailOptions, (error, info) => {
+  sendMail(mailOptions, (error, info) => {
     if (error) {
       console.error("Error sending email:", error);
     } else {
@@ -130,7 +130,7 @@ function sendVerifymail(name, email, token) {
   });
 }
 
-module.exports = {
+export default {
   sendOtp,
   generateOTP,
   sendVerifymail,
