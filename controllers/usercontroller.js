@@ -9,7 +9,7 @@ const {
   sendOtp,
   generateOTP,
   sendVerifymail,
-} = require("../utility/nodemailer.js");
+} = require("../helper/nodemailer.js");
 
 const bcrypt = require("bcrypt");
 const randomstring = require("randomstring");
