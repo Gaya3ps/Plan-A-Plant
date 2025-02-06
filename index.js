@@ -1,35 +1,35 @@
-const express = require("express");
+import express, { urlencoded, json, static } from "express";
 const app = express();
-const bcrypt = require("bcrypt");
-const mongoose = require("mongoose");
-const path = require("path");
+import bcrypt from "bcrypt";
+import mongoose from "mongoose";
+import path from "path";
 const PORT = 8000;
-const userRoute = require("./routes/userroute");
-const expressLayout = require("express-ejs-layouts");
-const adminRoute = require("./routes/adminroute");
-const database = require("./config/database");
-const bodyParser = require("body-parser");
+import userRoute from "./routes/userroute";
+import expressLayout from "express-ejs-layouts";
+import adminRoute from "./routes/adminroute";
+import { dbConnect } from "./config/database";
+import bodyParser from "body-parser";
 require("dotenv").config();
-const flash = require("connect-flash");
-const session = require("express-session");
-const nocache = require("nocache");
+import flash from "connect-flash";
+import session from "express-session";
+import nocache from "nocache";
 
 app.use((req, res, next) => {
   res.set("Cache-Control", "no-store");
   next();
 });
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(urlencoded({ extended: true }));
+app.use(json());
 app.set("view engine", "ejs");
 app.set("views", "./views");
 
-app.use(express.static("public"));
-app.use("/admin", express.static(__dirname + "/public"));
+app.use(static("public"));
+app.use("/admin", static(__dirname + "/public"));
 app.use(expressLayout);
 // res.header('Cache-Control', 'no-store, no-cache, must-revalidate, private');
 // app.use(nocache);
-database.dbConnect();
+dbConnect();
 
 app.use(
   session({
