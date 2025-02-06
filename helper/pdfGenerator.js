@@ -38,7 +38,7 @@ const generateInvoicePdf = async (req, res) => {
     });
 
     for (const item of orders.products) {
-      console.log("Item:", item); 
+      console.log("Item:", item);
 
       const product = item.product;
 
